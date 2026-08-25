@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <!-- Chatbot para Plataforma de Trocas e Vendas -->
+<div id="chat-widget" style="width: 320px; border: 1px solid #ccc; padding: 10px; font-family: sans-serif;">
+  <div id="chat-messages" style="height: 250px; overflow-y: auto; border-bottom: 1px solid #eee; margin-bottom: 10px;"></div>
+  <input type="text" id="user-input" placeholder="Pergunte sobre comprar, vender ou trocar..." style="width: 70%; padding: 5px;">
+  <button onclick="processMessage()" style="padding: 5px 10px;">Enviar</button>
+</div>
+
+<script>
+const faqData = {
+  "troca": "Para propor uma troca, acesse a página do anúncio e clique no botão 'Ofertar Troca'.",
+  "comprar": "Você pode comprar diretamente adicionando o item ao carrinho e escolhendo PIX ou cartão.",
+  "frete": "O valor do frete e o prazo de entrega são calculados informando seu CEP no carrinho.",
+  "vender": "Para anunciar um item, acesse 'Criar Anúncio' no menu superior e envie as fotos do produto."
+};
+
+function processMessage() {
+  const inputElement = document.getElementById("user-input");
+  const chatMessages = document.getElementById("chat-messages");
+  const userText = inputElement.value.trim().toLowerCase();
+
+  if (!userText) return;
+
+  chatMessages.innerHTML += `<p><strong>Você:</strong> ${inputElement.value}</p>`;
+
+  let botReply = "Desculpe, não entendi. Tente perguntar sobre **comprar**, **vender**, **troca** ou **frete**.";
+  
+  for (const key in faqData) {
+    if (userText.includes(key)) {
+      botReply = faqData[key];
+      break;
+    }
+  }
+
+  setTimeout(() => {
+    chatMessages.innerHTML += `<p><strong>Atendente:</strong> ${botReply}</p>`;
+    chatMessages.scrollTop = chatMessages.scrollHeight;
+  }, 300);
+
+  inputElement.value = "";
+}
+</script>
+</body>
+</html>
