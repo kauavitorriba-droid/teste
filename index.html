@@ -1,51 +1,282 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="pt-BR">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Chatbot Avançado</title>
+  <style>
+    :root {
+      --primary: #0084ff;
+      --bg: #f0f2f5;
+      --bot-msg: #e4e6eb;
+      --user-msg: #0084ff;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-color: var(--bg);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+
+    #chat-container {
+      width: 380px;
+      height: 550px;
+      background: #ffffff;
+      border-radius: 16px;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.12);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    /* Cabeçalho */
+    .chat-header {
+      background: var(--primary);
+      color: white;
+      padding: 15px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .avatar {
+      width: 35px;
+      height: 35px;
+      background: white;
+      color: var(--primary);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: bold;
+    }
+
+    .status { font-size: 0.8rem; opacity: 0.8; }
+
+    /* Área de mensagens */
+    #chat-box {
+      flex: 1;
+      padding: 15px;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .message {
+      max-width: 80%;
+      padding: 10px 14px;
+      border-radius: 16px;
+      font-size: 0.95rem;
+      line-height: 1.4;
+      animation: fadeIn 0.2s ease-in;
+    }
+
+    .bot {
+      background-color: var(--bot-msg);
+      color: #000;
+      align-self: flex-start;
+      border-bottom-left-radius: 4px;
+    }
+
+    .user {
+      background-color: var(--user-msg);
+      color: #fff;
+      align-self: flex-end;
+      border-bottom-right-radius: 4px;
+    }
+
+    .timestamp {
+      font-size: 0.7rem;
+      margin-top: 4px;
+      opacity: 0.6;
+      text-align: right;
+    }
+
+    /* Indicador de digitação */
+    .typing {
+      display: flex;
+      gap: 4px;
+      padding: 12px 16px;
+      align-self: flex-start;
+      background: var(--bot-msg);
+      border-radius: 16px;
+    }
+
+    .dot {
+      width: 6px;
+      height: 6px;
+      background: #888;
+      border-radius: 50%;
+      animation: blink 1.4s infinite ease-in-out both;
+    }
+
+    .dot:nth-child(1) { animation-delay: -0.32s; }
+    .dot:nth-child(2) { animation-delay: -0.16s; }
+
+    /* Botões de sugestão */
+    .quick-replies {
+      display: flex;
+      gap: 6px;
+      padding: 0 15px 10px;
+      overflow-x: auto;
+    }
+
+    .chip {
+      background: #e7f3ff;
+      color: var(--primary);
+      border: 1px solid var(--primary);
+      padding: 6px 12px;
+      border-radius: 16px;
+      font-size: 0.8rem;
+      cursor: pointer;
+      white-space: nowrap;
+    }
+
+    /* Input */
+    #input-container {
+      display: flex;
+      border-top: 1px solid #eee;
+      padding: 10px;
+      background: #fff;
+    }
+
+    #user-input {
+      flex: 1;
+      border: 1px solid #ddd;
+      border-radius: 20px;
+      padding: 10px 15px;
+      outline: none;
+    }
+
+    button {
+      background: var(--primary);
+      color: white;
+      border: none;
+      border-radius: 50%;
+      width: 40px;
+      height: 40px;
+      margin-left: 8px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
+    @keyframes blink { 0%, 80%, 100% { transform: scale(0); } 40% { transform: scale(1); } }
+  </style>
 </head>
 <body>
-    <!-- Chatbot para Plataforma de Trocas e Vendas -->
-<div id="chat-widget" style="width: 320px; border: 1px solid #ccc; padding: 10px; font-family: sans-serif;">
-  <div id="chat-messages" style="height: 250px; overflow-y: auto; border-bottom: 1px solid #eee; margin-bottom: 10px;"></div>
-  <input type="text" id="user-input" placeholder="Pergunte sobre comprar, vender ou trocar..." style="width: 70%; padding: 5px;">
-  <button onclick="processMessage()" style="padding: 5px 10px;">Enviar</button>
+
+<div id="chat-container">
+  <div class="chat-header">
+    <div class="avatar">AI</div>
+    <div>
+      <div>Assistente Virtual</div>
+      <div class="status">● Online</div>
+    </div>
+  </div>
+
+  <div id="chat-box">
+    <div class="message bot">
+      Olá! Como posso te ajudar hoje?
+      <div class="timestamp" id="start-time"></div>
+    </div>
+  </div>
+
+  <div class="quick-replies">
+    <button class="chip" onclick="sendQuickReply('Preços')">💰 Preços</button>
+    <button class="chip" onclick="sendQuickReply('Horário')">🕒 Horários</button>
+    <button class="chip" onclick="sendQuickReply('Contato')">📞 Contato</button>
+  </div>
+
+  <div id="input-container">
+    <input type="text" id="user-input" placeholder="Digite uma mensagem..." onkeydown="if(event.key==='Enter') sendMessage()">
+    <button onclick="sendMessage()">➔</button>
+  </div>
 </div>
 
 <script>
-const faqData = {
-  "troca": "Para propor uma troca, acesse a página do anúncio e clique no botão 'Ofertar Troca'.",
-  "comprar": "Você pode comprar diretamente adicionando o item ao carrinho e escolhendo PIX ou cartão.",
-  "frete": "O valor do frete e o prazo de entrega são calculados informando seu CEP no carrinho.",
-  "vender": "Para anunciar um item, acesse 'Criar Anúncio' no menu superior e envie as fotos do produto."
-};
+  document.getElementById('start-time').textContent = getTime();
 
-function processMessage() {
-  const inputElement = document.getElementById("user-input");
-  const chatMessages = document.getElementById("chat-messages");
-  const userText = inputElement.value.trim().toLowerCase();
-
-  if (!userText) return;
-
-  chatMessages.innerHTML += `<p><strong>Você:</strong> ${inputElement.value}</p>`;
-
-  let botReply = "Desculpe, não entendi. Tente perguntar sobre **comprar**, **vender**, **troca** ou **frete**.";
-  
-  for (const key in faqData) {
-    if (userText.includes(key)) {
-      botReply = faqData[key];
-      break;
-    }
+  function getTime() {
+    const now = new Date();
+    return now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
   }
 
-  setTimeout(() => {
-    chatMessages.innerHTML += `<p><strong>Atendente:</strong> ${botReply}</p>`;
-    chatMessages.scrollTop = chatMessages.scrollHeight;
-  }, 300);
+  function sendMessage(textOverride) {
+    const input = document.getElementById("user-input");
+    const text = textOverride || input.value.trim();
 
-  inputElement.value = "";
-}
+    if (!text) return;
+
+    appendMessage(text, 'user');
+    if (!textOverride) input.value = "";
+
+    showTyping();
+
+    // Simula tempo de resposta do bot (1 a 1.5s)
+    setTimeout(() => {
+      removeTyping();
+      const response = getBotResponse(text);
+      appendMessage(response, 'bot');
+    }, 1200);
+  }
+
+  function sendQuickReply(text) {
+    sendMessage(text);
+  }
+
+  function appendMessage(text, sender) {
+    const chatBox = document.getElementById("chat-box");
+    const msgDiv = document.createElement("div");
+    msgDiv.className = `message ${sender}`;
+    msgDiv.innerHTML = `${text}<div class="timestamp">${getTime()}</div>`;
+    
+    chatBox.appendChild(msgDiv);
+    chatBox.scrollTop = chatBox.scrollHeight;
+  }
+
+  function showTyping() {
+    const chatBox = document.getElementById("chat-box");
+    const typingDiv = document.createElement("div");
+    typingDiv.id = "typing-indicator";
+    typingDiv.className = "typing";
+    typingDiv.innerHTML = `<div class="dot"></div><div class="dot"></div><div class="dot"></div>`;
+    chatBox.appendChild(typingDiv);
+    chatBox.scrollTop = chatBox.scrollHeight;
+  }
+
+  function removeTyping() {
+    const typingDiv = document.getElementById("typing-indicator");
+    if (typingDiv) typingDiv.remove();
+  }
+
+  function getBotResponse(text) {
+    const clean = text.toLowerCase();
+
+    if (clean.includes("oi") || clean.includes("olá") || clean.includes("bom dia")) {
+      return "Olá! Tudo bem? Em que posso ser útil?";
+    }
+    if (clean.includes("preço") || clean.includes("preços") || clean.includes("valor")) {
+      return "Nossos planos começam em R$ 49,90/mês. Deseja conhecer o plano Pro?";
+    }
+    if (clean.includes("horário") || clean.includes("hora")) {
+      return "Atendemos de segunda a sexta, das 08h às 18h.";
+    }
+    if (clean.includes("contato") || clean.includes("suporte")) {
+      return "Você pode falar conosco pelo e-mail: contato@empresa.com";
+    }
+
+    return "Ainda estou aprendendo! Tente clicar em uma das opções acima ou perguntar sobre preços e horários.";
+  }
 </script>
+
 </body>
 </html>
