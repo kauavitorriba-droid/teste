@@ -55,22 +55,30 @@
       display: flex;
       justify-content: center;
       align-items: center;
-      height: 100vh;
+      min-height: 100vh;
+      padding: 10px;
       transition: background-color 0.3s;
     }
 
+    /* Container com dimensões flexíveis e classes de tamanho */
     #chat-container {
       position: relative;
       width: 100%;
-      max-width: 420px;
-      height: 640px;
+      max-width: 450px;
+      height: 88vh;
+      max-height: 680px;
       background: var(--card-bg);
       border-radius: 16px;
       box-shadow: 0 8px 24px rgba(0,0,0,0.15);
       display: flex;
       flex-direction: column;
       overflow: hidden;
+      transition: max-width 0.3s ease, max-height 0.3s ease;
     }
+
+    #chat-container.size-compact { max-width: 360px; max-height: 540px; }
+    #chat-container.size-normal { max-width: 450px; max-height: 680px; }
+    #chat-container.size-large { max-width: 650px; max-height: 820px; }
 
     .chat-header {
       background: var(--primary);
@@ -79,6 +87,7 @@
       display: flex;
       align-items: center;
       justify-content: space-between;
+      z-index: 5;
     }
 
     .header-info {
@@ -122,20 +131,21 @@
 
     .icon-btn:hover { background: rgba(255, 255, 255, 0.3); }
 
-    /* Painéis sobrepostos (Configurações e Carrinho) */
+    /* Correção nos painéis deslizantes (Sobreposição e isolamento de clique) */
     .slide-panel {
       position: absolute;
       top: 0; left: 0;
       width: 100%; height: 100%;
       background: var(--card-bg);
       color: var(--text-color);
-      z-index: 10;
+      z-index: 20;
       display: flex;
       flex-direction: column;
       padding: 20px;
       gap: 16px;
       transform: translateY(100%);
       transition: transform 0.3s ease-in-out;
+      overflow-y: auto;
     }
 
     .slide-panel.active { transform: translateY(0); }
@@ -190,6 +200,7 @@
       padding: 10px; border-radius: 8px;
       border: 1px solid var(--border-color);
       background: var(--bg); color: var(--text-color);
+      outline: none;
     }
 
     #chat-box {
@@ -224,7 +235,6 @@
       border-bottom-right-radius: 4px;
     }
 
-    /* Cards de Produtos no Chat */
     .product-cards-container {
       display: flex;
       flex-direction: column;
@@ -308,7 +318,7 @@
 </head>
 <body data-theme="default">
 
-<div id="chat-container">
+<div id="chat-container" class="size-normal">
   <div class="chat-header">
     <div class="header-info">
       <div class="avatar">🏢</div>
@@ -323,11 +333,11 @@
     </div>
   </div>
 
-  <!-- Painel do Carrinho -->
+  <!-- Painel de Carrinho -->
   <div id="cart-panel" class="slide-panel">
     <div class="panel-header">
       <h3>Seu Carrinho</h3>
-      <button class="icon-btn" onclick="toggleCart()" style="color: var(--text-color);">✖</button>
+      <button class="icon-btn" onclick="toggleCart()" style="color: var(--text-color); background: transparent;">✖</button>
     </div>
     <div class="cart-list" id="cart-items">
       <p style="text-align: center; opacity: 0.7; margin-top: 20px;">Seu carrinho está vazio.</p>
@@ -336,31 +346,42 @@
     <button class="btn-success" onclick="checkout()">Checkout / Finalizar Pedido</button>
   </div>
 
-  <!-- Painel de Configurações -->
+  <!-- Painel de Configurações Corrigido -->
   <div id="settings-panel" class="slide-panel">
     <div class="panel-header">
       <h3>Configurações</h3>
-      <button class="icon-btn" onclick="toggleSettings()" style="color: var(--text-color);">✖</button>
+      <button class="icon-btn" onclick="toggleSettings()" style="color: var(--text-color); background: transparent;">✖</button>
     </div>
+    
     <div class="settings-group">
-      <label>Nome do Assistente</label>
-      <input type="text" id="setting-bot-name" value="MegaMix Store" onchange="updateBotName(this.value)">
+      <label for="setting-bot-name">Nome do Assistente</label>
+      <input type="text" id="setting-bot-name" value="MegaMix Store" oninput="updateBotName(this.value)">
     </div>
+
     <div class="settings-group">
-      <label>Tema</label>
-      <select onchange="updateTheme(this.value)">
+      <label for="setting-theme">Tema Visual</label>
+      <select id="setting-theme" onchange="updateTheme(this.value)">
         <option value="default">Azul Padrão</option>
         <option value="dark">Modo Escuro</option>
         <option value="gamer">Neon Gamer</option>
       </select>
     </div>
-    <button style="background: #ef4444; color: white; border: none; padding: 10px; border-radius: 8px; margin-top: auto;" onclick="clearChat()">🗑️ Limpar Conversa</button>
+
+    <div class="settings-group">
+      <label for="setting-size">Tamanho da Janela do Chat</label>
+      <select id="setting-size" onchange="updateChatSize(this.value)">
+        <option value="size-compact">Compacto (Pequeno)</option>
+        <option value="size-normal" selected>Padrão (Médio)</option>
+        <option value="size-large">Expandido (Grande)</option>
+      </select>
+    </div>
+
+    <button style="background: #ef4444; color: white; border: none; padding: 12px; border-radius: 8px; margin-top: auto; cursor: pointer; font-weight: bold;" onclick="clearChat()">🗑️ Limpar Conversa</button>
   </div>
 
-  <!-- Caixa de Mensagens do Chat -->
   <div id="chat-box" role="log">
     <div class="message bot">
-      Bem-vindo à MegaMix! Escolha um setor para visualizar os produtos disponíveis e adicionar ao seu carrinho:
+      Bem-vindo à MegaMix! Escolha um setor para visualizar os produtos disponíveis ou digite sua dúvida no campo abaixo:
       <div class="timestamp" id="start-time"></div>
     </div>
   </div>
@@ -368,45 +389,50 @@
   <div class="quick-replies" id="quick-replies"></div>
 
   <form id="input-container" onsubmit="handleFormSubmit(event)">
-    <input type="text" id="user-input" placeholder="Digite uma dúvida ou escolha uma opção..." autocomplete="off">
+    <input type="text" id="user-input" placeholder="Digite sobre água, frete, garantia..." autocomplete="off">
     <button type="submit" class="send-btn">➔</button>
   </form>
 </div>
 
 <script>
-  const config = { responseDelay: 800 };
+  const config = { responseDelay: 700 };
   let cart = [];
 
-  // Base de Dados dos Produtos por Categoria
   const catalog = {
     cimento: [
       { id: 1, name: 'Cimento CP II 50kg Itaú', price: 34.90, desc: 'Resistência ideal para fundações e lajes.' },
       { id: 2, name: 'Saco de Areia Fina 20kg', price: 12.00, desc: 'Areia lavada para reboco fino.' },
-      { id: 3, name: 'Argamassa ACIII 20kg', price: 29.90, desc: 'Alta fixação para porcelanatos.' }
+      { id: 3, name: 'Argamassa ACIII 20kg', price: 29.90, desc: 'Alta fixação para porcelanatos e pedras.' },
+      { id: 4, name: 'Pedrisco Ensacado 20kg', price: 11.50, desc: 'Perfeito para concreto e drenagem.' }
     ],
     ferramentas: [
-      { id: 4, name: 'Furadeira de Impacto 750W', price: 249.90, desc: 'Motor potente para concreto e madeira.' },
-      { id: 5, name: 'Jogo de Chaves 40 Peças', price: 89.90, desc: 'Aço Cromo Vanádio com estojo.' }
+      { id: 6, name: 'Furadeira de Impacto 750W', price: 249.90, desc: 'Motor potente para concreto e madeira.' },
+      { id: 7, name: 'Jogo de Chaves 40 Peças', price: 89.90, desc: 'Aço Cromo Vanádio com estojo.' },
+      { id: 8, name: 'Esmerilhadeira Angular 4.1/2"', price: 319.00, desc: 'Cortes rápidos em metais e alvenaria.' }
     ],
     tintas: [
-      { id: 6, name: 'Tinta Acrílica Branca 18L', price: 189.00, desc: 'Rendimento extra e fácil aplicação.' },
-      { id: 7, name: 'Tinta Spray Multiuso 400ml', price: 24.90, desc: 'Secagem rápida em 30 minutos.' }
+      { id: 11, name: 'Tinta Acrílica Branca 18L', price: 189.00, desc: 'Rendimento extra e fácil aplicação.' },
+      { id: 12, name: 'Tinta Spray Multiuso 400ml', price: 24.90, desc: 'Secagem rápida em 30 minutos.' }
     ],
     eletrica: [
-      { id: 8, name: 'Cabo Flexível 2.5mm (100m)', price: 145.00, desc: 'Fio de cobre antichama normatizado.' },
-      { id: 9, name: 'Disjuntor Unipolar 20A', price: 18.50, desc: 'Proteção contra surtos elétricos.' }
+      { id: 16, name: 'Cabo Flexível 2.5mm (100m)', price: 145.00, desc: 'Fio de cobre antichama normatizado.' },
+      { id: 17, name: 'Disjuntor Unipolar 20A', price: 18.50, desc: 'Proteção contra surtos elétricos.' }
     ],
     pcs: [
-      { id: 10, name: 'PC Gamer RTX 4060 + i5', price: 4899.00, desc: '16GB RAM, SSD 1TB NVMe M.2.' },
-      { id: 11, name: 'Console Next-Gen 1TB', price: 3799.00, desc: 'Jogos em 4K nativo a 120 FPS.' }
+      { id: 21, name: 'PC Gamer RTX 4060 + i5', price: 4899.00, desc: '16GB RAM, SSD 1TB NVMe M.2.' },
+      { id: 22, name: 'Console Next-Gen 1TB', price: 3799.00, desc: 'Jogos em 4K nativo a 120 FPS.' }
     ],
     perifericos: [
-      { id: 12, name: 'Teclado Mecânico RGB', price: 229.90, desc: 'Switch Red silencioso e preciso.' },
-      { id: 13, name: 'Mouse Gamer 12.000 DPI', price: 119.90, desc: '6 botões programáveis.' }
+      { id: 26, name: 'Teclado Mecânico RGB', price: 229.90, desc: 'Switch Red silencioso e resistente a respingos.' },
+      { id: 27, name: 'Mouse Gamer 12.000 DPI', price: 119.90, desc: '6 botões programáveis ergonomia pro.' }
     ],
     smart: [
-      { id: 14, name: 'Lâmpada Smart Wi-Fi RGB', price: 49.90, desc: 'Controle por app e comando de voz.' },
-      { id: 15, name: 'Fechadura Digital Biométrica', price: 599.00, desc: 'Abertura por digital, senha e tag.' }
+      { id: 31, name: 'Lâmpada Smart Wi-Fi RGB', price: 49.90, desc: 'Controle por app e comando de voz.' },
+      { id: 32, name: 'Fechadura Digital Biométrica', price: 599.00, desc: 'Resistente a intempéries com biometria.' }
+    ],
+    auto: [
+      { id: 36, name: 'Pneu Aro 15 195/65R15', price: 319.90, desc: 'Excelente estabilidade e escoamento de água.' },
+      { id: 37, name: 'Compressor de Ar Digital 12V', price: 149.00, desc: 'Infla pneus, bolas e colchões.' }
     ]
   };
 
@@ -414,10 +440,11 @@
     main: [
       { label: '🏗️ Construção', value: 'Construção' },
       { label: '🕹️ Setor Gamer', value: 'Gamer' },
-      { label: '💡 Casa & Smart', value: 'Smart' }
+      { label: '💡 Casa & Smart', value: 'Smart' },
+      { label: '🚗 Automotivo', value: 'Auto' }
     ],
     construcao: [
-      { label: '🧱 Cimento & Areia', value: 'cimento' },
+      { label: '🧱 Cimento & Insumos', value: 'cimento' },
       { label: '🛠️ Ferramentas', value: 'ferramentas' },
       { label: '🎨 Tintas', value: 'tintas' },
       { label: '⚡ Elétrica', value: 'eletrica' },
@@ -430,6 +457,10 @@
     ],
     smart: [
       { label: '💡 Automação Smart', value: 'smart' },
+      { label: '⬅️ Voltar', value: 'main' }
+    ],
+    auto: [
+      { label: '🛞 Pneus & Acessórios', value: 'auto' },
       { label: '⬅️ Voltar', value: 'main' }
     ]
   };
@@ -453,11 +484,34 @@
     });
   }
 
-  function toggleSettings() { document.getElementById("settings-panel").classList.toggle("active"); }
-  function toggleCart() { document.getElementById("cart-panel").classList.toggle("active"); }
+  // Funções de Controle de Painéis
+  function toggleSettings() {
+    const settingsPanel = document.getElementById("settings-panel");
+    const cartPanel = document.getElementById("cart-panel");
+    cartPanel.classList.remove("active");
+    settingsPanel.classList.toggle("active");
+  }
 
-  function updateBotName(name) { document.getElementById("header-bot-name").textContent = name || "MegaMix Store"; }
-  function updateTheme(theme) { document.body.setAttribute("data-theme", theme); }
+  function toggleCart() {
+    const cartPanel = document.getElementById("cart-panel");
+    const settingsPanel = document.getElementById("settings-panel");
+    settingsPanel.classList.remove("active");
+    cartPanel.classList.toggle("active");
+  }
+
+  // Funções das Configurações
+  function updateBotName(name) {
+    document.getElementById("header-bot-name").textContent = name.trim() || "MegaMix Store";
+  }
+
+  function updateTheme(theme) {
+    document.body.setAttribute("data-theme", theme);
+  }
+
+  function updateChatSize(sizeClass) {
+    const chatContainer = document.getElementById("chat-container");
+    chatContainer.className = sizeClass;
+  }
 
   function clearChat() {
     document.getElementById("chat-box").innerHTML = `
@@ -467,6 +521,31 @@
       </div>`;
     renderQuickReplies(menus.main);
     toggleSettings();
+  }
+
+  function generateSmartReply(userText) {
+    const text = userText.toLowerCase();
+
+    if (text.includes('água') || text.includes('agua') || text.includes('resistente') || text.includes('impermeável') || text.includes('respingo')) {
+      return "💦 **Resistência a Líquidos:** Nossos teclados mecânicos e mousepads possuem proteção contra **respingos acidentais de água** (drenos internos). No entanto, não devem ser mergulhados totalmente na água!";
+    }
+    if (text.includes('frete') || text.includes('entrega') || text.includes('envio') || text.includes('prazo')) {
+      return "🚚 **Frete e Entrega:** Entregamos para todo o Brasil! O prazo médio é de 3 a 7 dias úteis. Frete Grátis em compras acima de R$ 199,00.";
+    }
+    if (text.includes('pagamento') || text.includes('pix') || text.includes('cartão') || text.includes('cartao') || text.includes('parcela')) {
+      return "💳 **Formas de Pagamento:** Aceitamos PIX (com 5% de desconto automático), Cartões de Crédito em até 10x sem juros e Boleto Bancário.";
+    }
+    if (text.includes('garantia') || text.includes('troca') || text.includes('devolução') || text.includes('devolucao')) {
+      return "🛡️ **Garantia & Trocas:** Todos os produtos possuem 90 dias de garantia legal contra defeitos de fábrica + 7 dias para devolução imediata por arrependimento.";
+    }
+    if (text.includes('teclado') || text.includes('mouse') || text.includes('gamer')) {
+      return "🕹️ Confira os periféricos e itens gamer no botão **Setor Gamer** ou no menu rápido abaixo!";
+    }
+    if (text.includes('oi') || text.includes('olá') || text.includes('ola') || text.includes('bom dia') || text.includes('boa tarde')) {
+      return "👋 Olá! Sou o assistente virtual da MegaMix. Como posso te ajudar hoje?";
+    }
+
+    return `🔍 Não encontrei uma resposta exata para "${userText}". Você pode perguntar sobre **resistência à água**, **frete**, **garantia**, **pagamento** ou navegar pelos botões abaixo:`;
   }
 
   function handleFormSubmit(e) {
@@ -479,7 +558,8 @@
     showTyping();
     setTimeout(() => {
       removeTyping();
-      appendBotText("Procurando itens correspondentes...");
+      const replyText = generateSmartReply(text);
+      appendBotText(replyText);
     }, config.responseDelay);
   }
 
@@ -502,8 +582,11 @@
       } else if (value === 'Smart') {
         appendBotText("Setor Casa & Smart Home:");
         renderQuickReplies(menus.smart);
+      } else if (value === 'Auto') {
+        appendBotText("Setor Automotivo:");
+        renderQuickReplies(menus.auto);
       } else if (catalog[value]) {
-        appendBotText(`Confira os produtos disponíveis em ${label}:`);
+        appendBotText(`Confira as opções de ${label}:`);
         renderProducts(catalog[value]);
       }
     }, config.responseDelay);
@@ -528,7 +611,9 @@
     const chatBox = document.getElementById("chat-box");
     const msgDiv = document.createElement("div");
     msgDiv.className = "message bot";
-    msgDiv.textContent = text;
+    
+    const formattedText = text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+    msgDiv.innerHTML = formattedText;
 
     const timeDiv = document.createElement("div");
     timeDiv.className = "timestamp";
@@ -539,7 +624,6 @@
     chatBox.scrollTop = chatBox.scrollHeight;
   }
 
-  // Renderiza produtos como CARDS INTERATIVOS com botões
   function renderProducts(productList) {
     const chatBox = document.getElementById("chat-box");
     const cardsContainer = document.createElement("div");
