@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>MegaMix - Do Tijolo ao Pixel</title>
+  <title>MegaMix - Megastore</title>
   <style>
     :root {
       --primary: #2563eb;
@@ -70,28 +70,31 @@
       display: flex;
       flex-direction: column;
       overflow: hidden;
-      transition: background-color 0.3s;
     }
 
     .chat-header {
       background: var(--primary);
       color: white;
-      padding: 16px;
+      padding: 14px 16px;
       display: flex;
       align-items: center;
       justify-content: space-between;
-      transition: background 0.3s;
     }
 
     .header-info {
       display: flex;
       align-items: center;
-      gap: 12px;
+      gap: 10px;
+    }
+
+    .header-actions {
+      display: flex;
+      gap: 6px;
     }
 
     .avatar {
-      width: 38px;
-      height: 38px;
+      width: 36px;
+      height: 36px;
       background: white;
       color: var(--primary);
       border-radius: 50%;
@@ -99,92 +102,94 @@
       align-items: center;
       justify-content: center;
       font-weight: bold;
-      font-size: 1.1rem;
     }
 
-    .status { font-size: 0.8rem; opacity: 0.9; }
+    .status { font-size: 0.75rem; opacity: 0.9; }
 
     .icon-btn {
-      background: transparent;
+      background: rgba(255, 255, 255, 0.15);
       border: none;
       color: white;
       cursor: pointer;
-      padding: 6px;
-      border-radius: 50%;
+      padding: 6px 10px;
+      border-radius: 20px;
       display: flex;
       align-items: center;
-      justify-content: center;
+      gap: 4px;
+      font-size: 0.85rem;
+      font-weight: bold;
     }
 
-    .icon-btn:hover { background: rgba(255, 255, 255, 0.2); }
+    .icon-btn:hover { background: rgba(255, 255, 255, 0.3); }
 
-    #settings-panel {
+    /* Painéis sobrepostos (Configurações e Carrinho) */
+    .slide-panel {
       position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
       background: var(--card-bg);
       color: var(--text-color);
       z-index: 10;
       display: flex;
       flex-direction: column;
       padding: 20px;
-      gap: 18px;
+      gap: 16px;
       transform: translateY(100%);
       transition: transform 0.3s ease-in-out;
     }
 
-    #settings-panel.active { transform: translateY(0); }
+    .slide-panel.active { transform: translateY(0); }
 
-    .settings-header {
+    .panel-header {
       display: flex;
       justify-content: space-between;
       align-items: center;
       border-bottom: 1px solid var(--border-color);
-      padding-bottom: 12px;
+      padding-bottom: 10px;
     }
 
-    .settings-group {
+    .cart-list {
+      flex: 1;
+      overflow-y: auto;
       display: flex;
       flex-direction: column;
-      gap: 6px;
+      gap: 10px;
     }
 
-    .settings-group label {
-      font-size: 0.85rem;
-      font-weight: 600;
-      opacity: 0.85;
-    }
-
-    .settings-group input[type="text"],
-    .settings-group select {
-      padding: 10px 12px;
+    .cart-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 10px;
+      background: var(--bg);
       border-radius: 8px;
       border: 1px solid var(--border-color);
-      background: var(--bg);
-      color: var(--text-color);
-      font-size: 0.9rem;
-      outline: none;
     }
 
-    .checkbox-group {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      cursor: pointer;
-      font-size: 0.9rem;
+    .cart-total {
+      font-size: 1.1rem;
+      font-weight: bold;
+      text-align: right;
+      padding-top: 10px;
+      border-top: 1px solid var(--border-color);
     }
 
-    .btn-danger {
-      background: #ef4444;
+    .btn-success {
+      background: #10b981;
       color: white;
       border: none;
-      padding: 10px;
+      padding: 12px;
       border-radius: 8px;
       cursor: pointer;
-      font-weight: 600;
-      margin-top: auto;
+      font-weight: bold;
+    }
+
+    .settings-group { display: flex; flex-direction: column; gap: 6px; }
+    .settings-group label { font-size: 0.85rem; font-weight: 600; }
+    .settings-group input, .settings-group select {
+      padding: 10px; border-radius: 8px;
+      border: 1px solid var(--border-color);
+      background: var(--bg); color: var(--text-color);
     }
 
     #chat-box {
@@ -194,18 +199,15 @@
       display: flex;
       flex-direction: column;
       gap: 12px;
-      scroll-behavior: smooth;
     }
 
     .message {
       max-width: 88%;
-      padding: 10px 14px;
+      padding: 12px 14px;
       border-radius: 16px;
-      font-size: 0.92rem;
-      line-height: 1.45;
+      font-size: 0.9rem;
+      line-height: 1.4;
       animation: fadeIn 0.2s ease-in;
-      word-wrap: break-word;
-      white-space: pre-wrap;
     }
 
     .bot {
@@ -222,89 +224,83 @@
       border-bottom-right-radius: 4px;
     }
 
-    .timestamp {
-      font-size: 0.7rem;
-      margin-top: 4px;
-      opacity: 0.7;
-      text-align: right;
-    }
-
-    .hide-timestamps .timestamp { display: none !important; }
-
-    .typing {
+    /* Cards de Produtos no Chat */
+    .product-cards-container {
       display: flex;
-      gap: 4px;
-      padding: 12px 16px;
-      align-self: flex-start;
-      background: var(--bot-msg);
-      border-radius: 16px;
-      border-bottom-left-radius: 4px;
+      flex-direction: column;
+      gap: 10px;
+      margin-top: 8px;
     }
 
-    .dot {
-      width: 6px;
-      height: 6px;
-      background: #888;
-      border-radius: 50%;
-      animation: blink 1.4s infinite ease-in-out both;
-    }
-
-    .dot:nth-child(1) { animation-delay: -0.32s; }
-    .dot:nth-child(2) { animation-delay: -0.16s; }
-
-    .quick-replies {
-      display: flex;
-      gap: 6px;
-      padding: 0 16px 12px;
-      overflow-x: auto;
-    }
-
-    .chip {
-      background: var(--bg);
-      color: var(--primary);
-      border: 1px solid var(--primary);
-      padding: 6px 12px;
-      border-radius: 16px;
-      font-size: 0.8rem;
-      cursor: pointer;
-      white-space: nowrap;
-      transition: background 0.2s;
-    }
-
-    .chip:hover { opacity: 0.8; }
-
-    #input-container {
-      display: flex;
-      border-top: 1px solid var(--border-color);
-      padding: 12px;
+    .product-card {
       background: var(--card-bg);
-      gap: 8px;
-    }
-
-    #user-input {
-      flex: 1;
-      border: 1px solid var(--border-color);
-      background: var(--bg);
       color: var(--text-color);
-      border-radius: 20px;
-      padding: 10px 16px;
-      outline: none;
+      border: 1px solid var(--border-color);
+      border-radius: 10px;
+      padding: 10px 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.05);
     }
 
-    button.send-btn {
+    .product-name { font-weight: bold; font-size: 0.9rem; }
+    .product-price { color: #10b981; font-weight: bold; font-size: 0.95rem; }
+    .product-desc { font-size: 0.78rem; opacity: 0.8; }
+
+    .add-cart-btn {
       background: var(--primary);
       color: white;
       border: none;
-      border-radius: 50%;
-      width: 40px;
-      height: 40px;
+      padding: 8px;
+      border-radius: 6px;
       cursor: pointer;
+      font-size: 0.8rem;
+      font-weight: bold;
+      margin-top: 6px;
       display: flex;
       align-items: center;
       justify-content: center;
+      gap: 6px;
+      transition: opacity 0.2s;
     }
 
-    button:disabled { background: var(--disabled) !important; cursor: not-allowed; }
+    .add-cart-btn:hover { opacity: 0.9; }
+
+    .timestamp { font-size: 0.68rem; margin-top: 4px; opacity: 0.7; text-align: right; }
+
+    .typing {
+      display: flex; gap: 4px; padding: 12px 16px;
+      align-self: flex-start; background: var(--bot-msg);
+      border-radius: 16px; border-bottom-left-radius: 4px;
+    }
+
+    .dot { width: 6px; height: 6px; background: #888; border-radius: 50%; animation: blink 1.4s infinite ease-in-out both; }
+    .dot:nth-child(1) { animation-delay: -0.32s; }
+    .dot:nth-child(2) { animation-delay: -0.16s; }
+
+    .quick-replies { display: flex; gap: 6px; padding: 0 16px 12px; overflow-x: auto; }
+
+    .chip {
+      background: var(--bg); color: var(--primary);
+      border: 1px solid var(--primary); padding: 6px 12px;
+      border-radius: 16px; font-size: 0.8rem; cursor: pointer; white-space: nowrap;
+    }
+
+    #input-container {
+      display: flex; border-top: 1px solid var(--border-color);
+      padding: 12px; background: var(--card-bg); gap: 8px;
+    }
+
+    #user-input {
+      flex: 1; border: 1px solid var(--border-color); background: var(--bg);
+      color: var(--text-color); border-radius: 20px; padding: 10px 16px; outline: none;
+    }
+
+    button.send-btn {
+      background: var(--primary); color: white; border: none;
+      border-radius: 50%; width: 40px; height: 40px; cursor: pointer;
+    }
 
     @keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
     @keyframes blink { 0%, 80%, 100% { transform: scale(0); } 40% { transform: scale(1); } }
@@ -315,57 +311,56 @@
 <div id="chat-container">
   <div class="chat-header">
     <div class="header-info">
-      <div class="avatar" aria-hidden="true">🏢</div>
+      <div class="avatar">🏢</div>
       <div>
-        <strong id="header-bot-name">MegaMix Megastore</strong>
-        <div class="status">● Loja Aberta</div>
+        <strong id="header-bot-name">MegaMix Store</strong>
+        <div class="status">● On-line</div>
       </div>
     </div>
-    <button class="icon-btn" id="open-settings-btn" onclick="toggleSettings()" aria-label="Abrir configurações">
-      ⚙️
-    </button>
+    <div class="header-actions">
+      <button class="icon-btn" onclick="toggleCart()">🛒 <span id="cart-count">0</span></button>
+      <button class="icon-btn" onclick="toggleSettings()">⚙️</button>
+    </div>
   </div>
 
-  <div id="settings-panel">
-    <div class="settings-header">
-      <h3>Configurações do Chat</h3>
+  <!-- Painel do Carrinho -->
+  <div id="cart-panel" class="slide-panel">
+    <div class="panel-header">
+      <h3>Seu Carrinho</h3>
+      <button class="icon-btn" onclick="toggleCart()" style="color: var(--text-color);">✖</button>
+    </div>
+    <div class="cart-list" id="cart-items">
+      <p style="text-align: center; opacity: 0.7; margin-top: 20px;">Seu carrinho está vazio.</p>
+    </div>
+    <div class="cart-total" id="cart-total-price">Total: R$ 0,00</div>
+    <button class="btn-success" onclick="checkout()">Checkout / Finalizar Pedido</button>
+  </div>
+
+  <!-- Painel de Configurações -->
+  <div id="settings-panel" class="slide-panel">
+    <div class="panel-header">
+      <h3>Configurações</h3>
       <button class="icon-btn" onclick="toggleSettings()" style="color: var(--text-color);">✖</button>
     </div>
-
     <div class="settings-group">
-      <label for="setting-bot-name">Nome do Assistente</label>
-      <input type="text" id="setting-bot-name" value="MegaMix Megastore" onchange="updateBotName(this.value)">
+      <label>Nome do Assistente</label>
+      <input type="text" id="setting-bot-name" value="MegaMix Store" onchange="updateBotName(this.value)">
     </div>
-
     <div class="settings-group">
-      <label for="setting-theme">Estilo da Loja</label>
-      <select id="setting-theme" onchange="updateTheme(this.value)">
+      <label>Tema</label>
+      <select onchange="updateTheme(this.value)">
         <option value="default">Azul Padrão</option>
         <option value="dark">Modo Escuro</option>
-        <option value="gamer">Neon Gamer (Roxo/Preto)</option>
+        <option value="gamer">Neon Gamer</option>
       </select>
     </div>
-
-    <div class="settings-group">
-      <label for="setting-speed">Velocidade da Resposta</label>
-      <select id="setting-speed" onchange="updateSpeed(this.value)">
-        <option value="500">Rápida (0.5s)</option>
-        <option value="1200" selected>Normal (1.2s)</option>
-        <option value="2500">Lenta (2.5s)</option>
-      </select>
-    </div>
-
-    <div class="checkbox-group">
-      <input type="checkbox" id="setting-timestamps" checked onchange="toggleTimestamps(this.checked)">
-      <label for="setting-timestamps">Exibir horário nas mensagens</label>
-    </div>
-
-    <button class="btn-danger" onclick="clearChat()">🗑️ Limpar Conversa</button>
+    <button style="background: #ef4444; color: white; border: none; padding: 10px; border-radius: 8px; margin-top: auto;" onclick="clearChat()">🗑️ Limpar Conversa</button>
   </div>
 
+  <!-- Caixa de Mensagens do Chat -->
   <div id="chat-box" role="log">
     <div class="message bot">
-      Bem-vindo à MegaMix! De materiais de construção a setups gamer, automotivo e casa inteligente. O que você procura hoje?
+      Bem-vindo à MegaMix! Escolha um setor para visualizar os produtos disponíveis e adicionar ao seu carrinho:
       <div class="timestamp" id="start-time"></div>
     </div>
   </div>
@@ -373,48 +368,69 @@
   <div class="quick-replies" id="quick-replies"></div>
 
   <form id="input-container" onsubmit="handleFormSubmit(event)">
-    <input type="text" id="user-input" placeholder="Digite sua dúvida ou escolha uma opção..." autocomplete="off">
-    <button type="submit" class="send-btn" id="send-btn" aria-label="Enviar">➔</button>
+    <input type="text" id="user-input" placeholder="Digite uma dúvida ou escolha uma opção..." autocomplete="off">
+    <button type="submit" class="send-btn">➔</button>
   </form>
 </div>
 
 <script>
-  const config = { responseDelay: 1200, showTimestamps: true };
+  const config = { responseDelay: 800 };
+  let cart = [];
 
-  // Menus expandidos com novos setores
+  // Base de Dados dos Produtos por Categoria
+  const catalog = {
+    cimento: [
+      { id: 1, name: 'Cimento CP II 50kg Itaú', price: 34.90, desc: 'Resistência ideal para fundações e lajes.' },
+      { id: 2, name: 'Saco de Areia Fina 20kg', price: 12.00, desc: 'Areia lavada para reboco fino.' },
+      { id: 3, name: 'Argamassa ACIII 20kg', price: 29.90, desc: 'Alta fixação para porcelanatos.' }
+    ],
+    ferramentas: [
+      { id: 4, name: 'Furadeira de Impacto 750W', price: 249.90, desc: 'Motor potente para concreto e madeira.' },
+      { id: 5, name: 'Jogo de Chaves 40 Peças', price: 89.90, desc: 'Aço Cromo Vanádio com estojo.' }
+    ],
+    tintas: [
+      { id: 6, name: 'Tinta Acrílica Branca 18L', price: 189.00, desc: 'Rendimento extra e fácil aplicação.' },
+      { id: 7, name: 'Tinta Spray Multiuso 400ml', price: 24.90, desc: 'Secagem rápida em 30 minutos.' }
+    ],
+    eletrica: [
+      { id: 8, name: 'Cabo Flexível 2.5mm (100m)', price: 145.00, desc: 'Fio de cobre antichama normatizado.' },
+      { id: 9, name: 'Disjuntor Unipolar 20A', price: 18.50, desc: 'Proteção contra surtos elétricos.' }
+    ],
+    pcs: [
+      { id: 10, name: 'PC Gamer RTX 4060 + i5', price: 4899.00, desc: '16GB RAM, SSD 1TB NVMe M.2.' },
+      { id: 11, name: 'Console Next-Gen 1TB', price: 3799.00, desc: 'Jogos em 4K nativo a 120 FPS.' }
+    ],
+    perifericos: [
+      { id: 12, name: 'Teclado Mecânico RGB', price: 229.90, desc: 'Switch Red silencioso e preciso.' },
+      { id: 13, name: 'Mouse Gamer 12.000 DPI', price: 119.90, desc: '6 botões programáveis.' }
+    ],
+    smart: [
+      { id: 14, name: 'Lâmpada Smart Wi-Fi RGB', price: 49.90, desc: 'Controle por app e comando de voz.' },
+      { id: 15, name: 'Fechadura Digital Biométrica', price: 599.00, desc: 'Abertura por digital, senha e tag.' }
+    ]
+  };
+
   const menus = {
     main: [
       { label: '🏗️ Construção', value: 'Construção' },
-      { label: '🕹️ Setor Gamer', value: 'Setor Gamer' },
-      { label: '💡 Casa & Smart', value: 'Casa e Smart' },
-      { label: '🚗 Automotivo', value: 'Automotivo' },
-      { label: '📍 Informações da Loja', value: 'Informações' }
+      { label: '🕹️ Setor Gamer', value: 'Gamer' },
+      { label: '💡 Casa & Smart', value: 'Smart' }
     ],
     construcao: [
-      { label: '🧱 Cimento e Basico', value: 'Cimento' },
-      { label: '🛠️ Ferramentas', value: 'Ferramentas' },
-      { label: '🎨 Tintas & Acabamento', value: 'Tintas' },
-      { label: '⚡ Elétrica & Hidráulica', value: 'Elétrica' },
-      { label: '⬅️ Voltar ao Menu', value: 'Menu Principal' }
+      { label: '🧱 Cimento & Areia', value: 'cimento' },
+      { label: '🛠️ Ferramentas', value: 'ferramentas' },
+      { label: '🎨 Tintas', value: 'tintas' },
+      { label: '⚡ Elétrica', value: 'eletrica' },
+      { label: '⬅️ Voltar', value: 'main' }
     ],
     gamer: [
-      { label: '🖥️ PCs & Consoles', value: 'PCs e Consoles' },
-      { label: '⌨️ Periféricos RGB', value: 'Periféricos RGB' },
-      { label: '🎧 Headsets & Áudio', value: 'Headsets' },
-      { label: '🪑 Cadeiras & Mesas', value: 'Cadeiras Gamer' },
-      { label: '⬅️ Voltar ao Menu', value: 'Menu Principal' }
+      { label: '🖥️ PCs & Consoles', value: 'pcs' },
+      { label: '⌨️ Periféricos RGB', value: 'perifericos' },
+      { label: '⬅️ Voltar', value: 'main' }
     ],
-    casaSmart: [
-      { label: '💡 Iluminação Smart', value: 'Iluminação' },
-      { label: '🔒 Segurança & Fechaduras', value: 'Segurança' },
-      { label: '🤖 Robôs & Eletro', value: 'Eletro' },
-      { label: '⬅️ Voltar ao Menu', value: 'Menu Principal' }
-    ],
-    automotivo: [
-      { label: '🛞 Pneus & Rodas', value: 'Pneus' },
-      { label: '🧰 Óleos & Manutenção', value: 'Manutenção' },
-      { label: '🧼 Estética Automotiva', value: 'Estética Auto' },
-      { label: '⬅️ Voltar ao Menu', value: 'Menu Principal' }
+    smart: [
+      { label: '💡 Automação Smart', value: 'smart' },
+      { label: '⬅️ Voltar', value: 'main' }
     ]
   };
 
@@ -432,77 +448,72 @@
       const btn = document.createElement("button");
       btn.className = "chip";
       btn.textContent = opt.label;
-      btn.onclick = () => sendQuickReply(opt.value);
+      btn.onclick = () => processUserChoice(opt.value, opt.label);
       container.appendChild(btn);
     });
   }
 
-  function toggleSettings() {
-    document.getElementById("settings-panel").classList.toggle("active");
-  }
+  function toggleSettings() { document.getElementById("settings-panel").classList.toggle("active"); }
+  function toggleCart() { document.getElementById("cart-panel").classList.toggle("active"); }
 
-  function updateBotName(newName) {
-    document.getElementById("header-bot-name").textContent = newName.trim() || "MegaMix Megastore";
-  }
-
-  function updateTheme(themeValue) {
-    document.body.setAttribute("data-theme", themeValue);
-  }
-
-  function updateSpeed(speedValue) {
-    config.responseDelay = parseInt(speedValue, 10);
-  }
-
-  function toggleTimestamps(show) {
-    config.showTimestamps = show;
-    document.getElementById("chat-box").classList.toggle("hide-timestamps", !show);
-  }
+  function updateBotName(name) { document.getElementById("header-bot-name").textContent = name || "MegaMix Store"; }
+  function updateTheme(theme) { document.body.setAttribute("data-theme", theme); }
 
   function clearChat() {
     document.getElementById("chat-box").innerHTML = `
       <div class="message bot">
-        Conversa reiniciada. Escolha um setor para começar:
+        Conversa reiniciada. Escolha um setor:
         <div class="timestamp">${getTime()}</div>
-      </div>
-    `;
+      </div>`;
     renderQuickReplies(menus.main);
     toggleSettings();
   }
 
   function handleFormSubmit(e) {
     e.preventDefault();
-    sendMessage();
-  }
-
-  function sendQuickReply(text) {
-    sendMessage(text);
-  }
-
-  function sendMessage(textOverride) {
     const input = document.getElementById("user-input");
-    const text = textOverride || input.value.trim();
-
+    const text = input.value.trim();
     if (!text) return;
+    appendUserMessage(text);
+    input.value = "";
+    showTyping();
+    setTimeout(() => {
+      removeTyping();
+      appendBotText("Procurando itens correspondentes...");
+    }, config.responseDelay);
+  }
 
-    appendMessage(text, 'user');
-    if (!textOverride) input.value = "";
-
-    setInteractiveState(false);
+  function processUserChoice(value, label) {
+    appendUserMessage(label);
     showTyping();
 
     setTimeout(() => {
       removeTyping();
-      processBotResponse(text);
-      setInteractiveState(true);
+
+      if (value === 'main') {
+        appendBotText("Selecione o setor desejado:");
+        renderQuickReplies(menus.main);
+      } else if (value === 'Construção') {
+        appendBotText("Setor de Construção. Escolha uma categoria:");
+        renderQuickReplies(menus.construcao);
+      } else if (value === 'Gamer') {
+        appendBotText("Setor Gamer. Escolha uma categoria:");
+        renderQuickReplies(menus.gamer);
+      } else if (value === 'Smart') {
+        appendBotText("Setor Casa & Smart Home:");
+        renderQuickReplies(menus.smart);
+      } else if (catalog[value]) {
+        appendBotText(`Confira os produtos disponíveis em ${label}:`);
+        renderProducts(catalog[value]);
+      }
     }, config.responseDelay);
   }
 
-  function appendMessage(text, sender) {
+  function appendUserMessage(text) {
     const chatBox = document.getElementById("chat-box");
     const msgDiv = document.createElement("div");
-    msgDiv.className = `message ${sender}`;
-
-    msgDiv.appendChild(document.createTextNode(text));
+    msgDiv.className = "message user";
+    msgDiv.textContent = text;
 
     const timeDiv = document.createElement("div");
     timeDiv.className = "timestamp";
@@ -511,6 +522,100 @@
 
     chatBox.appendChild(msgDiv);
     chatBox.scrollTop = chatBox.scrollHeight;
+  }
+
+  function appendBotText(text) {
+    const chatBox = document.getElementById("chat-box");
+    const msgDiv = document.createElement("div");
+    msgDiv.className = "message bot";
+    msgDiv.textContent = text;
+
+    const timeDiv = document.createElement("div");
+    timeDiv.className = "timestamp";
+    timeDiv.textContent = getTime();
+    msgDiv.appendChild(timeDiv);
+
+    chatBox.appendChild(msgDiv);
+    chatBox.scrollTop = chatBox.scrollHeight;
+  }
+
+  // Renderiza produtos como CARDS INTERATIVOS com botões
+  function renderProducts(productList) {
+    const chatBox = document.getElementById("chat-box");
+    const cardsContainer = document.createElement("div");
+    cardsContainer.className = "product-cards-container";
+
+    productList.forEach(prod => {
+      const card = document.createElement("div");
+      card.className = "product-card";
+
+      card.innerHTML = `
+        <div class="product-name">${prod.name}</div>
+        <div class="product-price">R$ ${prod.price.toFixed(2)}</div>
+        <div class="product-desc">${prod.desc}</div>
+        <button class="add-cart-btn" onclick="addToCart('${prod.name}', ${prod.price})">
+          🛒 Adicionar ao Carrinho
+        </button>
+      `;
+      cardsContainer.appendChild(card);
+    });
+
+    chatBox.appendChild(cardsContainer);
+    chatBox.scrollTop = chatBox.scrollHeight;
+  }
+
+  function addToCart(name, price) {
+    cart.push({ name, price });
+    updateCartUI();
+    appendBotText(`✅ "${name}" foi adicionado ao seu carrinho!`);
+  }
+
+  function updateCartUI() {
+    document.getElementById("cart-count").textContent = cart.length;
+    const cartItemsDiv = document.getElementById("cart-items");
+    const totalDiv = document.getElementById("cart-total-price");
+
+    if (cart.length === 0) {
+      cartItemsDiv.innerHTML = `<p style="text-align: center; opacity: 0.7; margin-top: 20px;">Seu carrinho está vazio.</p>`;
+      totalDiv.textContent = "Total: R$ 0,00";
+      return;
+    }
+
+    cartItemsDiv.innerHTML = "";
+    let total = 0;
+
+    cart.forEach((item, index) => {
+      total += item.price;
+      const div = document.createElement("div");
+      div.className = "cart-item";
+      div.innerHTML = `
+        <div>
+          <strong style="font-size: 0.85rem;">${item.name}</strong><br>
+          <span style="color: #10b981; font-weight: bold;">R$ ${item.price.toFixed(2)}</span>
+        </div>
+        <button style="background: transparent; border: none; color: #ef4444; cursor: pointer; font-size: 1.1rem;" onclick="removeFromCart(${index})">🗑️</button>
+      `;
+      cartItemsDiv.appendChild(div);
+    });
+
+    totalDiv.textContent = `Total: R$ ${total.toFixed(2)}`;
+  }
+
+  function removeFromCart(index) {
+    cart.splice(index, 1);
+    updateCartUI();
+  }
+
+  function checkout() {
+    if (cart.length === 0) {
+      alert("Seu carrinho está vazio!");
+      return;
+    }
+    alert("Pedido realizado com sucesso!");
+    cart = [];
+    updateCartUI();
+    toggleCart();
+    appendBotText("🎉 Obrigado pela compra! Seu pedido foi registrado.");
   }
 
   function showTyping() {
@@ -526,153 +631,6 @@
   function removeTyping() {
     const typingDiv = document.getElementById("typing-indicator");
     if (typingDiv) typingDiv.remove();
-  }
-
-  function setInteractiveState(enabled) {
-    document.getElementById("user-input").disabled = !enabled;
-    document.getElementById("send-btn").disabled = !enabled;
-    document.getElementById("open-settings-btn").disabled = !enabled;
-    document.querySelectorAll(".chip").forEach(chip => chip.disabled = !enabled);
-    if (enabled) document.getElementById("user-input").focus();
-  }
-
-  function processBotResponse(text) {
-    const clean = text.toLowerCase();
-    let responseText = "";
-
-    // --- NAVEGAÇÃO DE MENUS ---
-    if (clean.includes("constru")) {
-      responseText = "🏗️ Setor de Construção (Térreo - Ala A). Escolha a categoria desejada:";
-      renderQuickReplies(menus.construcao);
-    } 
-    else if (clean.includes("gamer")) {
-      responseText = "🕹️ Setor Gamer & Tech (1º Andar). Escolha uma categoria abaixo:";
-      renderQuickReplies(menus.gamer);
-    } 
-    else if (clean.includes("casa e smart") || clean.includes("smart")) {
-      responseText = "💡 Setor Casa & Smart Home (Térreo - Ala B). O que precisa para sua casa inteligente?";
-      renderQuickReplies(menus.casaSmart);
-    }
-    else if (clean.includes("automotivo")) {
-      responseText = "🚗 Setor Automotivo & Oficina (Anexo Externa). Confira as categorias:";
-      renderQuickReplies(menus.automotivo);
-    }
-    else if (clean.includes("menu principal") || clean.includes("voltar")) {
-      responseText = "Voltando ao menu principal. Escolha uma das áreas da MegaMix:";
-      renderQuickReplies(menus.main);
-    }
-
-    // --- CONSTRUÇÃO ---
-    else if (clean.includes("cimento")) {
-      responseText = "🧱 CONSTRUÇÃO & BÁSICO:\n\n" +
-        "1. Cimento CP II 50kg Itaú\n💰 R$ 34,90\n📝 Ideal para fundações, vigas e pisos.\n\n" +
-        "2. Saco de Areia Fina 20kg\n💰 R$ 12,00\n📝 Lavada e peneirada para acabamentos Finos.\n\n" +
-        "3. Argamassa ACIII Cinza 20kg\n💰 R$ 29,90\n📝 Alta aderência para porcelanatos e áreas externas.\n\n" +
-        "4. Tijolo Baiano 6 Furos (Milheiro)\n💰 R$ 890,00\n📝 Blocos cerâmicos para vedação e alvenaria.";
-    } 
-    else if (clean.includes("ferramentas")) {
-      responseText = "🛠️ FERRAMENTAS & MÁQUINAS:\n\n" +
-        "1. Furadeira de Impacto 750W 1/2\"\n💰 R$ 249,90\n📝 Motor potente para concreto, aço e madeira.\n\n" +
-        "2. Jogo de Chaves Soquete 40 Pçs\n💰 R$ 89,90\n📝 Aço Cromo Vanádio com estojo rígido.\n\n" +
-        "3. Esmerilhadeira Angular 4.1/2\" 840W\n💰 R$ 319,00\n📝 Para cortes e desbastes em metais e pedras.\n\n" +
-        "4. Nível a Laser 360° Verdes\n💰 R$ 450,00\n📝 Auto-nivelamento de alta precisão para alinhamentos.";
-    } 
-    else if (clean.includes("tintas")) {
-      responseText = "🎨 TINTAS & ACABAMENTO:\n\n" +
-        "1. Tinta Acrílica Fosca Branca 18L\n💰 R$ 189,00\n📝 Alta cobertura e lavabilidade para interiores/exteriores.\n\n" +
-        "2. Tinta Spray Multiuso 400ml (Cores)\n💰 R$ 24,90\n📝 Secagem rápida em 30min para madeira e metal.\n\n" +
-        "3. Rolo de Lã Antigota 23cm + Bandeja\n💰 R$ 35,00\n📝 Kit completo para pintura sem respingos.\n\n" +
-        "4. Selador Acrílico 18L\n💰 R$ 110,00\n📝 Uniformiza a absorção da parede antes da pintura.";
-    } 
-    else if (clean.includes("elétrica")) {
-      responseText = "⚡ ELÉTRICA & HIDRÁULICA:\n\n" +
-        "1. Rolo Cabo Flexível 2.5mm (100m)\n💰 R$ 145,00\n📝 Condutor de cobre antichama 750V.\n\n" +
-        "2. Disjuntor Unipolar DIN 20A\n💰 R$ 18,50\n📝 Proteção contra sobrecarga de energia.\n\n" +
-        "3. Tubo PVC Esgoto 100mm (6m)\n💰 R$ 68,00\n📝 Tubulação reforçada para esgoto sanitário.\n\n" +
-        "4. Chuveiro Eletrônico 7500W Turbo\n💰 R$ 199,90\n📝 Regulagem gradual de temperatura e pressurizador.";
-    }
-
-    // --- GAMER ---
-    else if (clean.includes("pcs e consoles")) {
-      responseText = "🖥️ PCS & CONSOLES:\n\n" +
-        "1. PC Gamer RTX 4060 + i5 13ª Gen\n💰 R$ 4.899,00\n📝 16GB RAM DDR4, SSD 1TB NVMe, Fonte 600W 80 Plus.\n\n" +
-        "2. Console Next-Gen 1TB SSD\n💰 R$ 3.799,00\n📝 Resolução 4K em 120 FPS, acompanha 1 controle.\n\n" +
-        "3. Notebook Gamer RTX 4050 144Hz\n💰 R$ 5.499,00\n📝 Tela IPS 15.6\", Intel i7, 16GB RAM, Teclado RGB.\n\n" +
-        "4. Console Portátil OLED 64GB\n💰 R$ 2.199,00\n📝 Tela vibrante de 7 polegadas e suporte ajustável.";
-    } 
-    else if (clean.includes("periféricos")) {
-      responseText = "⌨️ PERIFÉRICOS RGB:\n\n" +
-        "1. Teclado Mecânico RGB Switch Red\n💰 R$ 229,90\n📝 Padrão ABNT2, acionamento rápido e silencioso.\n\n" +
-        "2. Mouse Gamer 12.000 DPI Óptico\n💰 R$ 119,90\n📝 6 botões programáveis e peso ajustável.\n\n" +
-        "3. Mousepad Extra Large 90x40cm\n💰 R$ 69,90\n📝 Borda costurada e base em borracha antiderrapante.\n\n" +
-        "4. Microfone Condensador USB RGB\n💰 R$ 289,00\n📝 Filtro pop incluso, captação cardioide para streams.";
-    } 
-    else if (clean.includes("headsets")) {
-      responseText = "🎧 HEADSETS & ÁUDIO:\n\n" +
-        "1. Headset 7.1 Wireless Sem Fio\n💰 R$ 349,90\n📝 Bateria para até 30 horas e áudio espacial.\n\n" +
-        "2. Headset P3 Estéreo Pro Confort\n💰 R$ 129,90\n📝 Drivers de 50mm e microfone flexível removível.\n\n" +
-        "3. Caixas de Som 2.1 RGB 20W\n💰 R$ 159,90\n📝 Subwoofer dedicado para graves potentes.";
-    } 
-    else if (clean.includes("cadeiras gamer")) {
-      responseText = "🪑 CADEIRAS & MESAS GAMER:\n\n" +
-        "1. Cadeira Gamer Reclinável 180°\n💰 R$ 899,00\n📝 Apoio de braço 3D, pistão classe 4 e almofadas.\n\n" +
-        "2. Cadeira Mesh Ergonômica Pro\n💰 R$ 749,00\n📝 Encosto respirável com suporte lombar dinâmico.\n\n" +
-        "3. Mesa Gamer Z-Shape com LED RGB\n💰 R$ 599,00\n📝 Tampo textura fibra de carbono e suporte de copo/fone.";
-    }
-
-    // --- CASA & SMART ---
-    else if (clean.includes("iluminação")) {
-      responseText = "💡 ILUMINAÇÃO SMART:\n\n" +
-        "1. Lâmpada Inteligente Wi-Fi RGB 10W\n💰 R$ 49,90\n📝 16 milhões de cores, compatível com Alexa e Google.\n\n" +
-        "2. Fita LED Smart Wi-Fi 5m\n💰 R$ 89,90\n📝 Efeitos de luz dinâmicos sincronizados com música.\n\n" +
-        "3. Luminária de Mesa Smart com Carregador Indução\n💰 R$ 179,00\n📝 Ajuste de brilho e recarga de celular sem fio.";
-    }
-    else if (clean.includes("segurança")) {
-      responseText = "🔒 SEGURANÇA & FECHADURAS:\n\n" +
-        "1. Fechadura Digital Biométrica\n💰 R$ 599,00\n📝 Abertura por digital, senha, cartão e chave física.\n\n" +
-        "2. Câmera Wi-Fi 360° Full HD\n💰 R$ 189,90\n📝 Visão noturna, áudio bidirecional e detecção de movimento.\n\n" +
-        "3. Sensor de Abertura de Porta/Janela Zigbee\n💰 R$ 65,00\n📝 Notificação instantânea no celular em caso de invasão.";
-    }
-    else if (clean.includes("eletro")) {
-      responseText = "🤖 ROBÔS & ELETRODOMÉSTICOS:\n\n" +
-        "1. Robô Aspirador e Passa Pano Wi-Fi\n💰 R$ 899,00\n📝 Mapeamento inteligente e retorno automático à base.\n\n" +
-        "2. Air Fryer Digital 5.5L Inox\n💰 R$ 389,00\n📝 Painel touch screen com 8 funções pré-programadas.\n\n" +
-        "3. Cafeteira Expresso Automática\n💰 R$ 420,00\n📝 Pressão de 15 bar para café expresso e cappuccino.";
-    }
-
-    // --- AUTOMOTIVO ---
-    else if (clean.includes("pneus")) {
-      responseText = "🛞 PNEUS & RODAS:\n\n" +
-        "1. Pneu Aro 15 195/65R15 91H\n💰 R$ 319,90\n📝 Excelente aderência em pista molhada e durabilidade.\n\n" +
-        "2. Pneu Aro 14 175/65R14 82T\n💰 R$ 269,90\n📝 Economia de combustível para carros de passeio.\n\n" +
-        "3. Calibrador de Pneu Digital Portátil\n💰 R$ 149,00\n📝 Bateria recarregável, infla pneus, bikes e bolas.";
-    }
-    else if (clean.includes("manutenção")) {
-      responseText = "🧰 ÓLEOS & MANUTENÇÃO:\n\n" +
-        "1. Kit Óleo 5W30 Sintético 4L + Filtro\n💰 R$ 189,00\n📝 Proteção superior para motores modernos a gasolina/flex.\n\n" +
-        "2. Aditivo Para Radiador Pronto Uso 1L\n💰 R$ 22,00\n📝 Protege contra corrosão e superaquecimento.\n\n" +
-        "3. Jogo de Cabos de Chupeta 500A\n💰 R$ 55,00\n📝 Cabos reforçados para partida auxiliada de emergência.";
-    }
-    else if (clean.includes("estética auto")) {
-      responseText = "🧼 ESTÉTICA AUTOMOTIVA:\n\n" +
-        "1. Cera Cristalizadora de Carnaúba 300g\n💰 R$ 45,00\n📝 Brilho profundo e proteção hidrofóbica para a pintura.\n\n" +
-        "2. Shampoo Automotivo com Cera 2L\n💰 R$ 28,90\n📝 PH neutro, limpa sem remover proteções existentes.\n\n" +
-        "3. Lavadora de Alta Pressão 1500W\n💰 R$ 449,90\n📝 Jato regulável, ideal para lavar carros e calçadas.";
-    }
-
-    // --- GERAIS ---
-    else if (clean.includes("informações") || clean.includes("endereço") || clean.includes("horário")) {
-      responseText = "📍 MEGAMIX MEGASTORE\n" +
-        "🏢 Endereço: Av. dos Inventores, nº 1024 - Bairro NeoVila.\n" +
-        "🕒 Horário: Seg a Sáb: 08h às 20h | Dom: 09h às 14h\n" +
-        "📞 Whats: (11) 99999-1024\n" +
-        "🚘 Estacionamento gratuito com mais de 200 vagas!";
-    } 
-    else {
-      responseText = "Não entendi sua busca. Escolha um dos setores abaixo ou navegue pelas opções oferecidas!";
-    }
-
-    appendMessage(responseText, 'bot');
   }
 </script>
 
