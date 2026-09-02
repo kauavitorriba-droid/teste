@@ -267,7 +267,10 @@
       font-size: 0.8rem;
       cursor: pointer;
       white-space: nowrap;
+      transition: background 0.2s;
     }
+
+    .chip:hover { opacity: 0.8; }
 
     #input-container {
       display: flex;
@@ -366,15 +369,11 @@
     </div>
   </div>
 
-  <div class="quick-replies">
-    <button class="chip" onclick="sendQuickReply('🏗️ Construção')">🏗️ Construção</button>
-    <button class="chip" onclick="sendQuickReply('🕹️ Setor Gamer')">🕹️ Setor Gamer</button>
-    <button class="chip" onclick="sendQuickReply('📍 Endereço')">📍 Endereço</button>
-    <button class="chip" onclick="sendQuickReply('🕒 Horário')">🕒 Horário</button>
-  </div>
+  <!-- Botões Dinâmicos de Opções -->
+  <div class="quick-replies" id="quick-replies"></div>
 
   <form id="input-container" onsubmit="handleFormSubmit(event)">
-    <input type="text" id="user-input" placeholder="Digite sua dúvida sobre produtos ou a loja..." autocomplete="off">
+    <input type="text" id="user-input" placeholder="Digite sua dúvida ou escolha uma opção..." autocomplete="off">
     <button type="submit" class="send-btn" id="send-btn" aria-label="Enviar">➔</button>
   </form>
 </div>
@@ -382,10 +381,47 @@
 <script>
   const config = { responseDelay: 1200, showTimestamps: true };
 
+  // Estrutura de Menus Dinâmicos
+  const menus = {
+    main: [
+      { label: '🏗️ Construção', value: 'Construção' },
+      { label: '🕹️ Setor Gamer', value: 'Setor Gamer' },
+      { label: '📍 Endereço', value: 'Endereço' },
+      { label: '🕒 Horário', value: 'Horário' }
+    ],
+    construcao: [
+      { label: '🧱 Cimento e Areia', value: 'Cimento e Areia' },
+      { label: '🛠️ Ferramentas', value: 'Ferramentas' },
+      { label: '🎨 Tintas', value: 'Tintas' },
+      { label: '⚡ Elétrica e Hidráulica', value: 'Elétrica' },
+      { label: '⬅️ Voltar ao Menu', value: 'Menu Principal' }
+    ],
+    gamer: [
+      { label: '🖥️ PCs & Consoles', value: 'PCs e Consoles' },
+      { label: '⌨️ Periféricos RGB', value: 'Periféricos RGB' },
+      { label: '🎧 Headsets', value: 'Headsets' },
+      { label: '🪑 Cadeiras Gamer', value: 'Cadeiras Gamer' },
+      { label: '⬅️ Voltar ao Menu', value: 'Menu Principal' }
+    ]
+  };
+
   document.getElementById('start-time').textContent = getTime();
+  renderQuickReplies(menus.main);
 
   function getTime() {
     return new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+  }
+
+  function renderQuickReplies(options) {
+    const container = document.getElementById("quick-replies");
+    container.innerHTML = "";
+    options.forEach(opt => {
+      const btn = document.createElement("button");
+      btn.className = "chip";
+      btn.textContent = opt.label;
+      btn.onclick = () => sendQuickReply(opt.value);
+      container.appendChild(btn);
+    });
   }
 
   function toggleSettings() {
@@ -412,10 +448,11 @@
   function clearChat() {
     document.getElementById("chat-box").innerHTML = `
       <div class="message bot">
-        Conversa reiniciada. Precisa de algo do setor de construção ou gamer?
+        Conversa reiniciada. Como posso te ajudar hoje?
         <div class="timestamp">${getTime()}</div>
       </div>
     `;
+    renderQuickReplies(menus.main);
     toggleSettings();
   }
 
@@ -442,8 +479,7 @@
 
     setTimeout(() => {
       removeTyping();
-      const response = getBotResponse(text);
-      appendMessage(response, 'bot');
+      processBotResponse(text);
       setInteractiveState(true);
     }, config.responseDelay);
   }
@@ -487,29 +523,61 @@
     if (enabled) document.getElementById("user-input").focus();
   }
 
-  function getBotResponse(text) {
+  // Lógica de resposta com troca dinâmica de botões
+  function processBotResponse(text) {
     const clean = text.toLowerCase();
+    let responseText = "";
 
-    if (clean.includes("oi") || clean.includes("olá") || clean.includes("bom dia") || clean.includes("boa tarde")) {
-      return "Olá! Bem-vindo à MegaMix! Procurando materiais de obra ou um upgrade no seu setup gamer?";
+    if (clean.includes("constru") || clean.includes("obra")) {
+      responseText = "Entendido! O setor de Construção fica no nosso TÉRREO. O que você procura especificamente para a sua obra hoje?";
+      renderQuickReplies(menus.construcao);
+    } 
+    else if (clean.includes("gamer") || clean.includes("setup")) {
+      responseText = "Show! O Setor Gamer fica no 1º ANDAR. Qual item você deseja dar um upgrade hoje?";
+      renderQuickReplies(menus.gamer);
+    } 
+    else if (clean.includes("menu principal") || clean.includes("voltar")) {
+      responseText = "Voltando ao menu inicial. Escolha um dos setores ou tire sua dúvida:";
+      renderQuickReplies(menus.main);
     }
-    if (clean.includes("constru") || clean.includes("obra") || clean.includes("ferramenta") || clean.includes("tinta") || clean.includes("cimento")) {
-      return "Fica no nosso TÉRREO! Temos desde cimento, tintas e furadeiras até fiações e tubulação hidráulica.";
+    // Sub-opções de Construção
+    else if (clean.includes("cimento") || clean.includes("areia")) {
+      responseText = "Temos sacos de cimento de 50kg, areia ensacada e argamassa. Quantos sacos você precisa para calcularmos?";
+    } 
+    else if (clean.includes("ferramentas")) {
+      responseText = "Contamos com furadeiras, parafusadeiras, martelos e jogos de chaves. Procura alguma marca específica ou modelo a bateria?";
+    } 
+    else if (clean.includes("tintas")) {
+      responseText = "Trabalhamos com tintas acrílicas, esmaltes e sprays de diversas cores. Deseja tinta para área interna ou externa?";
+    } 
+    else if (clean.includes("elétrica") || clean.includes("hidráulica")) {
+      responseText = "Temos cabos flexíveis, disjuntores, tubos PVC e conexões. O que falta no seu projeto?";
     }
-    if (clean.includes("gamer") || clean.includes("pc") || clean.includes("teclado") || clean.includes("headset") || clean.includes("jogo") || clean.includes("placa")) {
-      return "Siga para o 1º ANDAR! Lá temos PCs prontos, teclados mecânicos, cadeiras ergonômicas, monitores 144Hz+ e consoles.";
+    // Sub-opções Gamer
+    else if (clean.includes("pcs") || clean.includes("consoles")) {
+      responseText = "Temos PCs Gamer montados com placas RTX e consoles de última geração. Deseja ver as opções de entrada ou de alta performance?";
+    } 
+    else if (clean.includes("periféricos")) {
+      responseText = "Temos teclados mecânicos RGB, mouses de alta precisão e mousepads gigantes. O que você quer adicionar ao setup?";
+    } 
+    else if (clean.includes("headsets")) {
+      responseText = "Contamos com headsets 7.1 surround, com fio e sem fio. Busca algum com cancelamento de ruído?";
+    } 
+    else if (clean.includes("cadeiras")) {
+      responseText = "Temos cadeiras gamer ergonômicas com ajuste lombar e reclináveis até 180°. Quer ver as cores disponíveis?";
     }
-    if (clean.includes("onde") || clean.includes("endereço") || clean.includes("local") || clean.includes("física") || clean.includes("fica")) {
-      return "Nossa loja física fica na Av. dos Inventores, nº 1024 - Bairro NeoVila. Temos estacionamento gratuito no local!";
-    }
-    if (clean.includes("horário") || clean.includes("hora") || clean.includes("aberto")) {
-      return "Funcionamos de segunda a sábado, das 08h às 20h, e domingos das 09h às 14h.";
-    }
-    if (clean.includes("contato") || clean.includes("whatsapp") || clean.includes("telefone")) {
-      return "Fale diretamente com os vendedores pelo WhatsApp: (11) 99999-1024 ou pelo e-mail contato@megamix.com.br.";
+    // Informações gerais
+    else if (clean.includes("endereço") || clean.includes("onde")) {
+      responseText = "Nossa loja física fica na Av. dos Inventores, nº 1024 - Bairro NeoVila. Temos estacionamento gratuito!";
+    } 
+    else if (clean.includes("horário") || clean.includes("hora")) {
+      responseText = "Funcionamos de segunda a sábado, das 08h às 20h, e domingos das 09h às 14h.";
+    } 
+    else {
+      responseText = "Ainda estou aprendendo sobre esse item! Escolha uma das opções abaixo ou pergunte sobre 'endereço' e 'horários'.";
     }
 
-    return "Não entendi direito, mas posso te ajudar com opções de 'construção', 'gamer', 'endereço' da loja física ou 'horário'!";
+    appendMessage(responseText, 'bot');
   }
 </script>
 
