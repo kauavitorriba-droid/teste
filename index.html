@@ -3,15 +3,66 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Chatbot Avançado</title>
+  <title>Chatbot Avançado com Configurações</title>
   <style>
+    /* Variáveis Globais de Tema */
     :root {
       --primary: #0084ff;
       --primary-hover: #006bce;
       --bg: #f0f2f5;
+      --card-bg: #ffffff;
+      --text-color: #1c1e21;
       --bot-msg: #e4e6eb;
+      --bot-text: #000000;
       --user-msg: #0084ff;
+      --user-text: #ffffff;
       --disabled: #b0b3b8;
+      --border-color: #e5e7eb;
+    }
+
+    /* Tema Escuro */
+    [data-theme="dark"] {
+      --primary: #3797f0;
+      --primary-hover: #1877f2;
+      --bg: #121212;
+      --card-bg: #1e1e1e;
+      --text-color: #f5f5f5;
+      --bot-msg: #2f3336;
+      --bot-text: #ffffff;
+      --user-msg: #3797f0;
+      --user-text: #ffffff;
+      --disabled: #555;
+      --border-color: #333333;
+    }
+
+    /* Tema Roxo Tech */
+    [data-theme="purple"] {
+      --primary: #7c3aed;
+      --primary-hover: #6d28d9;
+      --bg: #f3f0ff;
+      --card-bg: #ffffff;
+      --text-color: #1f2937;
+      --bot-msg: #f3e8ff;
+      --bot-text: #1f2937;
+      --user-msg: #7c3aed;
+      --user-text: #ffffff;
+      --disabled: #cbd5e1;
+      --border-color: #e2e8f0;
+    }
+
+    /* Tema Verde Esmeralda */
+    [data-theme="emerald"] {
+      --primary: #059669;
+      --primary-hover: #047857;
+      --bg: #ecfdf5;
+      --card-bg: #ffffff;
+      --text-color: #064e3b;
+      --bot-msg: #d1fae5;
+      --bot-text: #064e3b;
+      --user-msg: #059669;
+      --user-text: #ffffff;
+      --disabled: #cbd5e1;
+      --border-color: #e2e8f0;
     }
 
     * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -23,24 +74,35 @@
       justify-content: center;
       align-items: center;
       height: 100vh;
+      transition: background-color 0.3s;
     }
 
     #chat-container {
+      position: relative;
       width: 100%;
       max-width: 400px;
       height: 600px;
-      background: #ffffff;
+      background: var(--card-bg);
       border-radius: 16px;
       box-shadow: 0 8px 24px rgba(0,0,0,0.12);
       display: flex;
       flex-direction: column;
       overflow: hidden;
+      transition: background-color 0.3s;
     }
 
+    /* Cabeçalho */
     .chat-header {
       background: var(--primary);
       color: white;
       padding: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      transition: background 0.3s;
+    }
+
+    .header-info {
       display: flex;
       align-items: center;
       gap: 12px;
@@ -60,6 +122,105 @@
 
     .status { font-size: 0.8rem; opacity: 0.9; }
 
+    .icon-btn {
+      background: transparent;
+      border: none;
+      color: white;
+      cursor: pointer;
+      padding: 6px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background 0.2s;
+    }
+
+    .icon-btn:hover {
+      background: rgba(255, 255, 255, 0.2);
+    }
+
+    /* Painel de Configurações (Slide Overlay) */
+    #settings-panel {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: var(--card-bg);
+      color: var(--text-color);
+      z-index: 10;
+      display: flex;
+      flex-direction: column;
+      padding: 20px;
+      gap: 18px;
+      transform: translateY(100%);
+      transition: transform 0.3s ease-in-out, background-color 0.3s;
+    }
+
+    #settings-panel.active {
+      transform: translateY(0);
+    }
+
+    .settings-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid var(--border-color);
+      padding-bottom: 12px;
+    }
+
+    .settings-header h3 {
+      font-size: 1.1rem;
+    }
+
+    .settings-group {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .settings-group label {
+      font-size: 0.85rem;
+      font-weight: 600;
+      opacity: 0.85;
+    }
+
+    .settings-group input[type="text"],
+    .settings-group select {
+      padding: 10px 12px;
+      border-radius: 8px;
+      border: 1px solid var(--border-color);
+      background: var(--bg);
+      color: var(--text-color);
+      font-size: 0.9rem;
+      outline: none;
+    }
+
+    .checkbox-group {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      cursor: pointer;
+      font-size: 0.9rem;
+      user-select: none;
+    }
+
+    .btn-danger {
+      background: #ef4444;
+      color: white;
+      border: none;
+      padding: 10px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: 600;
+      font-size: 0.9rem;
+      margin-top: auto;
+      transition: background 0.2s;
+    }
+
+    .btn-danger:hover { background: #dc2626; }
+
+    /* Área de mensagens */
     #chat-box {
       flex: 1;
       padding: 16px;
@@ -82,14 +243,14 @@
 
     .bot {
       background-color: var(--bot-msg);
-      color: #000;
+      color: var(--bot-text);
       align-self: flex-start;
       border-bottom-left-radius: 4px;
     }
 
     .user {
       background-color: var(--user-msg);
-      color: #fff;
+      color: var(--user-text);
       align-self: flex-end;
       border-bottom-right-radius: 4px;
     }
@@ -101,6 +262,12 @@
       text-align: right;
     }
 
+    /* Oculta horários se configurado */
+    .hide-timestamps .timestamp {
+      display: none !important;
+    }
+
+    /* Digitação */
     .typing {
       display: flex;
       gap: 4px;
@@ -122,6 +289,7 @@
     .dot:nth-child(1) { animation-delay: -0.32s; }
     .dot:nth-child(2) { animation-delay: -0.16s; }
 
+    /* Sugestões */
     .quick-replies {
       display: flex;
       gap: 6px;
@@ -130,7 +298,7 @@
     }
 
     .chip {
-      background: #e7f3ff;
+      background: var(--bg);
       color: var(--primary);
       border: 1px solid var(--primary);
       padding: 6px 12px;
@@ -141,19 +309,22 @@
       transition: background 0.2s;
     }
 
-    .chip:hover { background: #d0e7ff; }
+    .chip:hover { opacity: 0.8; }
 
+    /* Form Entrada */
     #input-container {
       display: flex;
-      border-top: 1px solid #eee;
+      border-top: 1px solid var(--border-color);
       padding: 12px;
-      background: #fff;
+      background: var(--card-bg);
       gap: 8px;
     }
 
     #user-input {
       flex: 1;
-      border: 1px solid #ddd;
+      border: 1px solid var(--border-color);
+      background: var(--bg);
+      color: var(--text-color);
       border-radius: 20px;
       padding: 10px 16px;
       outline: none;
@@ -177,23 +348,75 @@
     }
 
     button.send-btn:hover { background: var(--primary-hover); }
-    button:disabled { background: var(--disabled); cursor: not-allowed; }
+    button:disabled { background: var(--disabled) !important; cursor: not-allowed; }
 
     @keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
     @keyframes blink { 0%, 80%, 100% { transform: scale(0); } 40% { transform: scale(1); } }
   </style>
 </head>
-<body>
+<body data-theme="default">
 
 <div id="chat-container">
+  <!-- Cabeçalho -->
   <div class="chat-header">
-    <div class="avatar" aria-hidden="true">AI</div>
-    <div>
-      <strong>Assistente Virtual</strong>
-      <div class="status">● Online</div>
+    <div class="header-info">
+      <div class="avatar" aria-hidden="true">AI</div>
+      <div>
+        <strong id="header-bot-name">Assistente Virtual</strong>
+        <div class="status">● Online</div>
+      </div>
     </div>
+    <!-- Botão de Engrenagem -->
+    <button class="icon-btn" id="open-settings-btn" onclick="toggleSettings()" aria-label="Abrir configurações">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="12" cy="12" r="3"></circle>
+        <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+      </svg>
+    </button>
   </div>
 
+  <!-- Painel de Configurações (Slide In) -->
+  <div id="settings-panel">
+    <div class="settings-header">
+      <h3>Configurações</h3>
+      <button class="icon-btn" onclick="toggleSettings()" style="color: var(--text-color);" aria-label="Fechar configurações">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+      </button>
+    </div>
+
+    <div class="settings-group">
+      <label for="setting-bot-name">Nome do Assistente</label>
+      <input type="text" id="setting-bot-name" value="Assistente Virtual" onchange="updateBotName(this.value)">
+    </div>
+
+    <div class="settings-group">
+      <label for="setting-theme">Tema do Chat</label>
+      <select id="setting-theme" onchange="updateTheme(this.value)">
+        <option value="default">Azul Padrão</option>
+        <option value="dark">Modo Escuro (Dark)</option>
+        <option value="purple">Roxo Tech</option>
+        <option value="emerald">Verde Esmeralda</option>
+      </select>
+    </div>
+
+    <div class="settings-group">
+      <label for="setting-speed">Velocidade de Resposta</label>
+      <select id="setting-speed" onchange="updateSpeed(this.value)">
+        <option value="500">Rápida (0.5s)</option>
+        <option value="1200" selected>Normal (1.2s)</option>
+        <option value="2500">Lenta (2.5s)</option>
+      </select>
+    </div>
+
+    <div class="checkbox-group">
+      <input type="checkbox" id="setting-timestamps" checked onchange="toggleTimestamps(this.checked)">
+      <label for="setting-timestamps">Exibir horário nas mensagens</label>
+    </div>
+
+    <button class="btn-danger" onclick="clearChat()">🗑️ Limpar Histórico do Chat</button>
+  </div>
+
+  <!-- Área do Chat -->
   <div id="chat-box" role="log" aria-live="polite">
     <div class="message bot">
       Olá! Como posso te ajudar hoje?
@@ -201,12 +424,14 @@
     </div>
   </div>
 
+  <!-- Sugestões Rápidas -->
   <div class="quick-replies" id="quick-replies">
     <button class="chip" onclick="sendQuickReply('Preços')">💰 Preços</button>
     <button class="chip" onclick="sendQuickReply('Horário')">🕒 Horários</button>
     <button class="chip" onclick="sendQuickReply('Contato')">📞 Contato</button>
   </div>
 
+  <!-- Formulário de Envio -->
   <form id="input-container" onsubmit="handleFormSubmit(event)">
     <input type="text" id="user-input" placeholder="Digite uma mensagem..." autocomplete="off">
     <button type="submit" class="send-btn" id="send-btn" aria-label="Enviar mensagem">
@@ -216,10 +441,61 @@
 </div>
 
 <script>
+  // Estado das configurações
+  const config = {
+    responseDelay: 1200,
+    showTimestamps: true
+  };
+
   document.getElementById('start-time').textContent = getTime();
 
   function getTime() {
     return new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+  }
+
+  // Alternar painel de configurações
+  function toggleSettings() {
+    const panel = document.getElementById("settings-panel");
+    panel.classList.toggle("active");
+  }
+
+  // Atualizar Nome do Bot
+  function updateBotName(newName) {
+    const name = newName.trim() || "Assistente Virtual";
+    document.getElementById("header-bot-name").textContent = name;
+  }
+
+  // Atualizar Tema
+  function updateTheme(themeValue) {
+    document.body.setAttribute("data-theme", themeValue);
+  }
+
+  // Atualizar Velocidade de Resposta
+  function updateSpeed(speedValue) {
+    config.responseDelay = parseInt(speedValue, 10);
+  }
+
+  // Alternar visualização de horários
+  function toggleTimestamps(show) {
+    config.showTimestamps = show;
+    const chatBox = document.getElementById("chat-box");
+    if (show) {
+      chatBox.classList.remove("hide-timestamps");
+    } else {
+      chatBox.classList.add("hide-timestamps");
+    }
+  }
+
+  // Limpar Chat
+  function clearChat() {
+    const chatBox = document.getElementById("chat-box");
+    chatBox.innerHTML = `
+      <div class="message bot">
+        Conversa reiniciada. Como posso te ajudar?
+        <div class="timestamp">${getTime()}</div>
+      </div>
+    `;
+    toggleSettings();
   }
 
   function handleFormSubmit(e) {
@@ -243,12 +519,13 @@
     setInteractiveState(false);
     showTyping();
 
+    // Utiliza a velocidade configurada pelo usuário
     setTimeout(() => {
       removeTyping();
       const response = getBotResponse(text);
       appendMessage(response, 'bot');
       setInteractiveState(true);
-    }, 1200);
+    }, config.responseDelay);
   }
 
   function appendMessage(text, sender) {
@@ -256,7 +533,7 @@
     const msgDiv = document.createElement("div");
     msgDiv.className = `message ${sender}`;
 
-    // Prevenção contra XSS
+    // Proteção contra XSS
     const textNode = document.createTextNode(text);
     msgDiv.appendChild(textNode);
 
@@ -287,6 +564,7 @@
   function setInteractiveState(enabled) {
     document.getElementById("user-input").disabled = !enabled;
     document.getElementById("send-btn").disabled = !enabled;
+    document.getElementById("open-settings-btn").disabled = !enabled;
     const chips = document.querySelectorAll(".chip");
     chips.forEach(chip => chip.disabled = !enabled);
     if (enabled) document.getElementById("user-input").focus();
