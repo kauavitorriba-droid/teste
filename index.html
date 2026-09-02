@@ -3,66 +3,48 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Chatbot Avançado com Configurações</title>
+  <title>MegaMix - Do Tijolo ao Pixel</title>
   <style>
-    /* Variáveis Globais de Tema */
     :root {
-      --primary: #0084ff;
-      --primary-hover: #006bce;
-      --bg: #f0f2f5;
+      --primary: #2563eb;
+      --primary-hover: #1d4ed8;
+      --bg: #f1f5f9;
       --card-bg: #ffffff;
-      --text-color: #1c1e21;
-      --bot-msg: #e4e6eb;
-      --bot-text: #000000;
-      --user-msg: #0084ff;
+      --text-color: #0f172a;
+      --bot-msg: #e2e8f0;
+      --bot-text: #0f172a;
+      --user-msg: #2563eb;
       --user-text: #ffffff;
-      --disabled: #b0b3b8;
-      --border-color: #e5e7eb;
+      --disabled: #94a3b8;
+      --border-color: #cbd5e1;
     }
 
-    /* Tema Escuro */
     [data-theme="dark"] {
-      --primary: #3797f0;
-      --primary-hover: #1877f2;
-      --bg: #121212;
-      --card-bg: #1e1e1e;
-      --text-color: #f5f5f5;
-      --bot-msg: #2f3336;
-      --bot-text: #ffffff;
-      --user-msg: #3797f0;
+      --primary: #3b82f6;
+      --primary-hover: #2563eb;
+      --bg: #0f172a;
+      --card-bg: #1e293b;
+      --text-color: #f8fafc;
+      --bot-msg: #334155;
+      --bot-text: #f8fafc;
+      --user-msg: #3b82f6;
       --user-text: #ffffff;
-      --disabled: #555;
-      --border-color: #333333;
+      --disabled: #475569;
+      --border-color: #334155;
     }
 
-    /* Tema Roxo Tech */
-    [data-theme="purple"] {
-      --primary: #7c3aed;
-      --primary-hover: #6d28d9;
-      --bg: #f3f0ff;
-      --card-bg: #ffffff;
-      --text-color: #1f2937;
-      --bot-msg: #f3e8ff;
-      --bot-text: #1f2937;
-      --user-msg: #7c3aed;
+    [data-theme="gamer"] {
+      --primary: #a855f7;
+      --primary-hover: #9333ea;
+      --bg: #18181b;
+      --card-bg: #27272a;
+      --text-color: #f4f4f5;
+      --bot-msg: #3f3f46;
+      --bot-text: #f4f4f5;
+      --user-msg: #a855f7;
       --user-text: #ffffff;
-      --disabled: #cbd5e1;
-      --border-color: #e2e8f0;
-    }
-
-    /* Tema Verde Esmeralda */
-    [data-theme="emerald"] {
-      --primary: #059669;
-      --primary-hover: #047857;
-      --bg: #ecfdf5;
-      --card-bg: #ffffff;
-      --text-color: #064e3b;
-      --bot-msg: #d1fae5;
-      --bot-text: #064e3b;
-      --user-msg: #059669;
-      --user-text: #ffffff;
-      --disabled: #cbd5e1;
-      --border-color: #e2e8f0;
+      --disabled: #52525b;
+      --border-color: #3f3f46;
     }
 
     * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -84,14 +66,13 @@
       height: 600px;
       background: var(--card-bg);
       border-radius: 16px;
-      box-shadow: 0 8px 24px rgba(0,0,0,0.12);
+      box-shadow: 0 8px 24px rgba(0,0,0,0.15);
       display: flex;
       flex-direction: column;
       overflow: hidden;
       transition: background-color 0.3s;
     }
 
-    /* Cabeçalho */
     .chat-header {
       background: var(--primary);
       color: white;
@@ -118,6 +99,7 @@
       align-items: center;
       justify-content: center;
       font-weight: bold;
+      font-size: 1.1rem;
     }
 
     .status { font-size: 0.8rem; opacity: 0.9; }
@@ -132,14 +114,10 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      transition: background 0.2s;
     }
 
-    .icon-btn:hover {
-      background: rgba(255, 255, 255, 0.2);
-    }
+    .icon-btn:hover { background: rgba(255, 255, 255, 0.2); }
 
-    /* Painel de Configurações (Slide Overlay) */
     #settings-panel {
       position: absolute;
       top: 0;
@@ -154,12 +132,10 @@
       padding: 20px;
       gap: 18px;
       transform: translateY(100%);
-      transition: transform 0.3s ease-in-out, background-color 0.3s;
+      transition: transform 0.3s ease-in-out;
     }
 
-    #settings-panel.active {
-      transform: translateY(0);
-    }
+    #settings-panel.active { transform: translateY(0); }
 
     .settings-header {
       display: flex;
@@ -167,10 +143,6 @@
       align-items: center;
       border-bottom: 1px solid var(--border-color);
       padding-bottom: 12px;
-    }
-
-    .settings-header h3 {
-      font-size: 1.1rem;
     }
 
     .settings-group {
@@ -202,7 +174,6 @@
       gap: 10px;
       cursor: pointer;
       font-size: 0.9rem;
-      user-select: none;
     }
 
     .btn-danger {
@@ -213,14 +184,9 @@
       border-radius: 8px;
       cursor: pointer;
       font-weight: 600;
-      font-size: 0.9rem;
       margin-top: auto;
-      transition: background 0.2s;
     }
 
-    .btn-danger:hover { background: #dc2626; }
-
-    /* Área de mensagens */
     #chat-box {
       flex: 1;
       padding: 16px;
@@ -232,7 +198,7 @@
     }
 
     .message {
-      max-width: 80%;
+      max-width: 82%;
       padding: 10px 14px;
       border-radius: 16px;
       font-size: 0.95rem;
@@ -262,12 +228,8 @@
       text-align: right;
     }
 
-    /* Oculta horários se configurado */
-    .hide-timestamps .timestamp {
-      display: none !important;
-    }
+    .hide-timestamps .timestamp { display: none !important; }
 
-    /* Digitação */
     .typing {
       display: flex;
       gap: 4px;
@@ -281,7 +243,7 @@
     .dot {
       width: 6px;
       height: 6px;
-      background: #65676b;
+      background: #888;
       border-radius: 50%;
       animation: blink 1.4s infinite ease-in-out both;
     }
@@ -289,7 +251,6 @@
     .dot:nth-child(1) { animation-delay: -0.32s; }
     .dot:nth-child(2) { animation-delay: -0.16s; }
 
-    /* Sugestões */
     .quick-replies {
       display: flex;
       gap: 6px;
@@ -306,12 +267,8 @@
       font-size: 0.8rem;
       cursor: pointer;
       white-space: nowrap;
-      transition: background 0.2s;
     }
 
-    .chip:hover { opacity: 0.8; }
-
-    /* Form Entrada */
     #input-container {
       display: flex;
       border-top: 1px solid var(--border-color);
@@ -328,10 +285,7 @@
       border-radius: 20px;
       padding: 10px 16px;
       outline: none;
-      font-size: 0.95rem;
     }
-
-    #user-input:focus { border-color: var(--primary); }
 
     button.send-btn {
       background: var(--primary);
@@ -344,10 +298,8 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      transition: background 0.2s;
     }
 
-    button.send-btn:hover { background: var(--primary-hover); }
     button:disabled { background: var(--disabled) !important; cursor: not-allowed; }
 
     @keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
@@ -357,50 +309,41 @@
 <body data-theme="default">
 
 <div id="chat-container">
-  <!-- Cabeçalho -->
   <div class="chat-header">
     <div class="header-info">
-      <div class="avatar" aria-hidden="true">AI</div>
+      <div class="avatar" aria-hidden="true">🛠️</div>
       <div>
-        <strong id="header-bot-name">Assistente Virtual</strong>
-        <div class="status">● Online</div>
+        <strong id="header-bot-name">Atendimento MegaMix</strong>
+        <div class="status">● Loja Aberta</div>
       </div>
     </div>
-    <!-- Botão de Engrenagem -->
     <button class="icon-btn" id="open-settings-btn" onclick="toggleSettings()" aria-label="Abrir configurações">
-      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-        <circle cx="12" cy="12" r="3"></circle>
-        <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
-      </svg>
+      ⚙️
     </button>
   </div>
 
-  <!-- Painel de Configurações (Slide In) -->
   <div id="settings-panel">
     <div class="settings-header">
-      <h3>Configurações</h3>
-      <button class="icon-btn" onclick="toggleSettings()" style="color: var(--text-color);" aria-label="Fechar configurações">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
-      </button>
+      <h3>Configurações do Chat</h3>
+      <button class="icon-btn" onclick="toggleSettings()" style="color: var(--text-color);">✖</button>
     </div>
 
     <div class="settings-group">
       <label for="setting-bot-name">Nome do Assistente</label>
-      <input type="text" id="setting-bot-name" value="Assistente Virtual" onchange="updateBotName(this.value)">
+      <input type="text" id="setting-bot-name" value="Atendimento MegaMix" onchange="updateBotName(this.value)">
     </div>
 
     <div class="settings-group">
-      <label for="setting-theme">Tema do Chat</label>
+      <label for="setting-theme">Estilo da Loja</label>
       <select id="setting-theme" onchange="updateTheme(this.value)">
         <option value="default">Azul Padrão</option>
-        <option value="dark">Modo Escuro (Dark)</option>
-        <option value="purple">Roxo Tech</option>
-        <option value="emerald">Verde Esmeralda</option>
+        <option value="dark">Modo Escuro</option>
+        <option value="gamer">Neon Gamer (Roxo/Preto)</option>
       </select>
     </div>
 
     <div class="settings-group">
-      <label for="setting-speed">Velocidade de Resposta</label>
+      <label for="setting-speed">Velocidade da Resposta</label>
       <select id="setting-speed" onchange="updateSpeed(this.value)">
         <option value="500">Rápida (0.5s)</option>
         <option value="1200" selected>Normal (1.2s)</option>
@@ -413,39 +356,31 @@
       <label for="setting-timestamps">Exibir horário nas mensagens</label>
     </div>
 
-    <button class="btn-danger" onclick="clearChat()">🗑️ Limpar Histórico do Chat</button>
+    <button class="btn-danger" onclick="clearChat()">🗑️ Limpar Conversa</button>
   </div>
 
-  <!-- Área do Chat -->
-  <div id="chat-box" role="log" aria-live="polite">
+  <div id="chat-box" role="log">
     <div class="message bot">
-      Olá! Como posso te ajudar hoje?
+      Bem-vindo à MegaMix! Temos tudo do tijolo ao pixel. Como posso te ajudar hoje?
       <div class="timestamp" id="start-time"></div>
     </div>
   </div>
 
-  <!-- Sugestões Rápidas -->
-  <div class="quick-replies" id="quick-replies">
-    <button class="chip" onclick="sendQuickReply('Preços')">💰 Preços</button>
-    <button class="chip" onclick="sendQuickReply('Horário')">🕒 Horários</button>
-    <button class="chip" onclick="sendQuickReply('Contato')">📞 Contato</button>
+  <div class="quick-replies">
+    <button class="chip" onclick="sendQuickReply('🏗️ Construção')">🏗️ Construção</button>
+    <button class="chip" onclick="sendQuickReply('🕹️ Setor Gamer')">🕹️ Setor Gamer</button>
+    <button class="chip" onclick="sendQuickReply('📍 Endereço')">📍 Endereço</button>
+    <button class="chip" onclick="sendQuickReply('🕒 Horário')">🕒 Horário</button>
   </div>
 
-  <!-- Formulário de Envio -->
   <form id="input-container" onsubmit="handleFormSubmit(event)">
-    <input type="text" id="user-input" placeholder="Digite uma mensagem..." autocomplete="off">
-    <button type="submit" class="send-btn" id="send-btn" aria-label="Enviar mensagem">
-      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
-    </button>
+    <input type="text" id="user-input" placeholder="Digite sua dúvida sobre produtos ou a loja..." autocomplete="off">
+    <button type="submit" class="send-btn" id="send-btn" aria-label="Enviar">➔</button>
   </form>
 </div>
 
 <script>
-  // Estado das configurações
-  const config = {
-    responseDelay: 1200,
-    showTimestamps: true
-  };
+  const config = { responseDelay: 1200, showTimestamps: true };
 
   document.getElementById('start-time').textContent = getTime();
 
@@ -453,45 +388,31 @@
     return new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
   }
 
-  // Alternar painel de configurações
   function toggleSettings() {
-    const panel = document.getElementById("settings-panel");
-    panel.classList.toggle("active");
+    document.getElementById("settings-panel").classList.toggle("active");
   }
 
-  // Atualizar Nome do Bot
   function updateBotName(newName) {
-    const name = newName.trim() || "Assistente Virtual";
-    document.getElementById("header-bot-name").textContent = name;
+    document.getElementById("header-bot-name").textContent = newName.trim() || "Atendimento MegaMix";
   }
 
-  // Atualizar Tema
   function updateTheme(themeValue) {
     document.body.setAttribute("data-theme", themeValue);
   }
 
-  // Atualizar Velocidade de Resposta
   function updateSpeed(speedValue) {
     config.responseDelay = parseInt(speedValue, 10);
   }
 
-  // Alternar visualização de horários
   function toggleTimestamps(show) {
     config.showTimestamps = show;
-    const chatBox = document.getElementById("chat-box");
-    if (show) {
-      chatBox.classList.remove("hide-timestamps");
-    } else {
-      chatBox.classList.add("hide-timestamps");
-    }
+    document.getElementById("chat-box").classList.toggle("hide-timestamps", !show);
   }
 
-  // Limpar Chat
   function clearChat() {
-    const chatBox = document.getElementById("chat-box");
-    chatBox.innerHTML = `
+    document.getElementById("chat-box").innerHTML = `
       <div class="message bot">
-        Conversa reiniciada. Como posso te ajudar?
+        Conversa reiniciada. Precisa de algo do setor de construção ou gamer?
         <div class="timestamp">${getTime()}</div>
       </div>
     `;
@@ -519,7 +440,6 @@
     setInteractiveState(false);
     showTyping();
 
-    // Utiliza a velocidade configurada pelo usuário
     setTimeout(() => {
       removeTyping();
       const response = getBotResponse(text);
@@ -533,9 +453,7 @@
     const msgDiv = document.createElement("div");
     msgDiv.className = `message ${sender}`;
 
-    // Proteção contra XSS
-    const textNode = document.createTextNode(text);
-    msgDiv.appendChild(textNode);
+    msgDiv.appendChild(document.createTextNode(text));
 
     const timeDiv = document.createElement("div");
     timeDiv.className = "timestamp";
@@ -565,28 +483,33 @@
     document.getElementById("user-input").disabled = !enabled;
     document.getElementById("send-btn").disabled = !enabled;
     document.getElementById("open-settings-btn").disabled = !enabled;
-    const chips = document.querySelectorAll(".chip");
-    chips.forEach(chip => chip.disabled = !enabled);
+    document.querySelectorAll(".chip").forEach(chip => chip.disabled = !enabled);
     if (enabled) document.getElementById("user-input").focus();
   }
 
   function getBotResponse(text) {
     const clean = text.toLowerCase();
 
-    if (clean.includes("oi") || clean.includes("olá") || clean.includes("bom dia")) {
-      return "Olá! Tudo bem? Em que posso ser útil?";
+    if (clean.includes("oi") || clean.includes("olá") || clean.includes("bom dia") || clean.includes("boa tarde")) {
+      return "Olá! Bem-vindo à MegaMix! Procurando materiais de obra ou um upgrade no seu setup gamer?";
     }
-    if (clean.includes("preço") || clean.includes("preços") || clean.includes("valor")) {
-      return "Nossos planos começam em R$ 49,90/mês. Deseja conhecer o plano Pro?";
+    if (clean.includes("constru") || clean.includes("obra") || clean.includes("ferramenta") || clean.includes("tinta") || clean.includes("cimento")) {
+      return "Fica no nosso TÉRREO! Temos desde cimento, tintas e furadeiras até fiações e tubulação hidráulica.";
     }
-    if (clean.includes("horário") || clean.includes("hora")) {
-      return "Atendemos de segunda a sexta, das 08h às 18h.";
+    if (clean.includes("gamer") || clean.includes("pc") || clean.includes("teclado") || clean.includes("headset") || clean.includes("jogo") || clean.includes("placa")) {
+      return "Siga para o 1º ANDAR! Lá temos PCs prontos, teclados mecânicos, cadeiras ergonômicas, monitores 144Hz+ e consoles.";
     }
-    if (clean.includes("contato") || clean.includes("suporte")) {
-      return "Você pode falar conosco pelo e-mail: contato@empresa.com";
+    if (clean.includes("onde") || clean.includes("endereço") || clean.includes("local") || clean.includes("física") || clean.includes("fica")) {
+      return "Nossa loja física fica na Av. dos Inventores, nº 1024 - Bairro NeoVila. Temos estacionamento gratuito no local!";
+    }
+    if (clean.includes("horário") || clean.includes("hora") || clean.includes("aberto")) {
+      return "Funcionamos de segunda a sábado, das 08h às 20h, e domingos das 09h às 14h.";
+    }
+    if (clean.includes("contato") || clean.includes("whatsapp") || clean.includes("telefone")) {
+      return "Fale diretamente com os vendedores pelo WhatsApp: (11) 99999-1024 ou pelo e-mail contato@megamix.com.br.";
     }
 
-    return "Ainda estou aprendendo! Tente clicar em uma das opções acima ou perguntar sobre preços e horários.";
+    return "Não entendi direito, mas posso te ajudar com opções de 'construção', 'gamer', 'endereço' da loja física ou 'horário'!";
   }
 </script>
 
